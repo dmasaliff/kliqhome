@@ -47,7 +47,7 @@ export async function submitOrder(data: {
   }
 
   try {
-    const orderUrl = `https://localhost:3000/order/${newOrder.id}`;
+    const orderUrl = `https://kliqhome.vercel.app/order/${newOrder.id}`;
     const msgTeknisi = 
       `🚨 *ORDER BARU KLIQ HOME* 🚨
 

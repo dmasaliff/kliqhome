@@ -1,6 +1,7 @@
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 
 export function SuccessSection() {
   return (
@@ -21,12 +22,14 @@ export function SuccessSection() {
       </div>
 
       {/* Button Chat CS */}
-      <Button className="bg-[#007AFF] hover:bg-blue-600 text-white rounded-2xl py-7 px-10 text-lg font-bold shadow-lg flex items-center gap-3 w-full max-w-xs">
-        Chat CS Sekarang
-        <div className="bg-white rounded-full p-1">
-           <Image src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" width={20} height={20} />
-        </div>
-      </Button>
+      <Link href="https://wa.me/6285726129692" target="_blank" className="inline-block">
+        <Button className="bg-[#007AFF] hover:bg-blue-600 text-white rounded-2xl py-7 px-10 text-lg font-bold shadow-lg flex items-center gap-3 w-full max-w-xs">
+          Chat CS Sekarang
+          <div className="bg-white rounded-full p-1">
+            <Image src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" width={20} height={20} />
+          </div>
+        </Button>
+      </Link>
     </div>
   );
 }

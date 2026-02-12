@@ -131,15 +131,6 @@ export default function PesanPage() {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 className="border-blue-300 rounded-xl min-h-20" placeholder="Nama jalan, nomor rumah..." />
-              <button className="absolute bottom-2 right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-md flex items-center gap-1">
-                <MapPin size={10} /> Gunakan lokasi saat ini
-              </button>
-            </div>
-          </div>
-          {/* Placeholder Map - Ganti dengan Image asli nanti */}
-          <div className="w-full h-32 bg-gray-200 rounded-xl overflow-hidden relative">
-            <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs">
-              [ Peta Lokasi ]
             </div>
           </div>
         </div>

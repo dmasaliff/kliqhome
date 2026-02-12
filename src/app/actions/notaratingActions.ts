@@ -32,7 +32,7 @@ export async function sendWhastappInvoice({
         Total Bayar: Rp ${total_price?.toLocaleString('id-ID') || '0'}
 
         Mohon bantu kami meningkatkan kualitas layanan dengan memberikan rating untuk teknisi kami melalui link berikut:
-        👉 https://localhost:3000/rating/${technician_id}
+        👉 https://kliqhome.vercel.app/rating/${technician_id}
 
         Simpan nota digital ini sebagai bukti garansi. 
         KLIQ Home - Solusi Dingin Tanpa Ribet! ❄️`;
