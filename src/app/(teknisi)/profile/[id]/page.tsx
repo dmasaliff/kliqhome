@@ -33,6 +33,7 @@ export default function TechnicianProfile() {
         specialization: string;
         average_rating: number;
         total_jobs: number;
+        phone: string;
     } | null>(null);
 
     useEffect(() => {
@@ -138,6 +139,7 @@ export default function TechnicianProfile() {
                     </div>
                     <p>Nama : <span className="font-medium">{profile.name}</span></p>
                     <p>ID Mitra : <span className="font-medium">{profile.id}</span></p>
+                    <p>No. HP : <span className="font-medium">{profile.phone}</span></p>
                     <p>Spesialisasi : <span className="font-medium">{profile.specialization}</span></p>
                     <div className="flex items-center gap-2">
                         <TechnicianRating rating={Number(profile.average_rating)} size={16} />

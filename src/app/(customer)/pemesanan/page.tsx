@@ -15,6 +15,7 @@ export default function PesanPage() {
   const [customer_name, setCustomer_name] = useState("");
   const [customer_phone, setCustomer_phone] = useState("");
   const [address, setAddress] = useState("");
+  const [keluhan, setKeluhan] = useState("");
   const [service, setService] = useState<string[]>([]);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -118,7 +119,11 @@ export default function PesanPage() {
           ))}
           <div className="pt-2">
             <label className="text-[10px] font-bold">KELUHAN :</label>
-            <Textarea className="mt-1 border-blue-300 rounded-lg min-h-15" placeholder="Ceritakan masalah AC anda..." />
+            <Textarea 
+              value={keluhan}
+              onChange={(e) => setKeluhan(e.target.value)}
+              className="mt-1 border-blue-300 rounded-lg min-h-15"
+              placeholder="Ceritakan masalah AC anda..." />
           </div>
         </div>
 

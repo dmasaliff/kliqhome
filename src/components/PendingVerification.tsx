@@ -9,7 +9,7 @@ export function PendingVerification() {
   const router = useRouter();
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
-  const [isAccepted, setIsAccepted] = useState(false); // State baru untuk trigger UI diterima
+  const [isAccepted, setIsAccepted] = useState(false); 
 
   useEffect(() => {
     const checkStatus = async () => {
@@ -29,12 +29,11 @@ export function PendingVerification() {
       setLoading(false);
     };
 
-    // Fungsi untuk animasi transisi sebelum pindah halaman
     const handleSuccess = () => {
       setIsAccepted(true);
       setTimeout(() => {
         router.push('/login');
-      }, 3000); // Beri jeda 3 detik agar teknisi bisa baca pesan "Diterima"
+      }, 3000);
     };
 
     checkStatus();

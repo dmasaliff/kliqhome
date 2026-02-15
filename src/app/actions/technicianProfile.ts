@@ -5,7 +5,7 @@ export async function getTechnicianProfile(techId: string) {
 
   const { data, error } = await supabase
     .from('technicians')
-    .select('id, name, specialization, average_rating, total_jobs')
+    .select('id, name, phone, specialization, average_rating, total_jobs')
     .eq('id', techId)
     .single();
 
@@ -52,3 +52,4 @@ export async function getTechnicianHistory(techId: string) {
   if (error) return [];
   return data;
 }
+

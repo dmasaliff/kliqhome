@@ -14,6 +14,7 @@ interface Order {
   customer_phone: string;
   address: string;
   service: string[];
+  keluhan: string;
   time_slot: string;
   status: 'available' | 'taken';
   total_price: number;
@@ -125,6 +126,7 @@ export default function OrderPage() {
           service={layananText} 
           address={orderData.address ? orderData.address.split(",")[0] : "Lokasi tidak tersedia"}
           time_slot={orderData?.time_slot}
+          keluhan={orderData?.keluhan}
         />
 
         {/* Tombol Aksi */}
