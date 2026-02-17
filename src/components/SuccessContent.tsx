@@ -3,13 +3,24 @@
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
 import { SuccessCard } from '@/components/SuccessCard';
+import { createClient } from '@/utils/supabase/client';
 
 
 export function SuccessContent() {
+    const supabase = createClient();
     const searchParams = useSearchParams();
     const amountStr = searchParams.get('amount');
-    const profileId = searchParams.get('profileId');
     const totalPendapatan = amountStr ? parseInt(amountStr) : 0;
+
+    const handleGoToProfile = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+        window.location.href = `/profile/${user.id}`;
+    } else {
+        window.location.href = '/login';
+    }
+};
 
     return (
 
@@ -41,7 +52,7 @@ export function SuccessContent() {
         {/* Button Section */}
         <div className="w-full max-w-[320px] pb-10 mt-8">
             <button 
-            onClick={() => window.location.href = `/profile/${profileId}`}
+            onClick={handleGoToProfile}
             className="w-full bg-[#007AFF] hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-md transition-all active:scale-95"
             >
             Lihat Riwayat Pendapatan
