@@ -5,7 +5,7 @@ import Link from "next/link"
 import { TechnicianRating } from "@/components/TechnicianRating"
 import { TechnicianAvatar } from "@/components/TechnicianAvatar"
 import { useEffect, useState } from "react"
-import { UploadFoto } from "@/components/UploadFoto"
+import { UploadFotoDocument } from "@/components/UploadFotoDocument"
 import { useParams, useRouter } from "next/navigation"
 import {createClient} from "@/utils/supabase/client"
 import { uploadTransferProof } from "@/app/actions/uploadTransfer"
@@ -140,7 +140,13 @@ export default function TechnicianProfile() {
                     <p>Nama : <span className="font-medium">{profile.name}</span></p>
                     <p>ID Mitra : <span className="font-medium">{profile.id}</span></p>
                     <p>No. HP : <span className="font-medium">{profile.phone}</span></p>
-                    <p>Spesialisasi : <span className="font-medium">{profile.specialization}</span></p>
+                    <p>Spesialisasi : 
+                        <span className="font-medium">
+                            {Array.isArray(profile.specialization) 
+                                ? profile.specialization.join(', ') 
+                                : profile.specialization}
+                        </span>
+                    </p>
                     <div className="flex items-center gap-2">
                         <TechnicianRating rating={Number(profile.average_rating)} size={16} />
                         <p className="mx-2">|</p>
@@ -156,10 +162,10 @@ export default function TechnicianProfile() {
                         {formatIDR(finance.gross)}
                     </span>
                     <p>Total Pendapatan Kotor Bulan Ini</p>
-                    <p>Jatah Mitra (80%) : <span className="font-medium text-[#007AFF]">{formatIDR(finance.mitra)}</span></p>
-                    <p>Kewajiban Setor (20%) : <span className="font-medium text-red-500">{formatIDR(finance.obligation)}</span></p>
+                    <p>Jatah Mitra (90%) : <span className="font-medium text-[#007AFF]">{formatIDR(finance.mitra)}</span></p>
+                    <p>Kewajiban Setor (10%) : <span className="font-medium text-red-500">{formatIDR(finance.obligation)}</span></p>
 
-                    <UploadFoto 
+                    <UploadFotoDocument 
                         id="foto-bukti-transfer" 
                         label="Foto Bukti Transfer Kewajiban Setor" 
                         previewUrl={previewTransfer} 

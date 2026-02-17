@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { DataPelanggan } from "@/components/DataPelanggan";
-import { UploadFoto } from "@/components/UploadFoto";
+import { UploadFotoBeforeAfter } from "@/components/UploadFotoBeforeAfter";
 import {uploadPhoto} from "@/app/actions/uploadActions";
 import {useRouter, useParams} from "next/navigation";
 import {createClient} from "@/utils/supabase/client"
@@ -114,7 +114,7 @@ export default function DetailPekerjaan() {
       const urlBefore = await uploadPhoto(fileBefore, 'before');
       const urlAfter = await uploadPhoto(fileAfter, 'after');
       const totalPrice = totalBiaya;
-      const technicianShare = totalPrice * 0.8;
+      const technicianShare = totalPrice * 0.9;
 
       console.log("Mencoba update booking dengan ID:", params.id);
       console.log("URL Before:", urlBefore);
@@ -250,7 +250,7 @@ export default function DetailPekerjaan() {
         <div className="space-y-3">
 
             {/* BAGIAN SEBELUM */}
-            <UploadFoto 
+            <UploadFotoBeforeAfter 
             id="foto-sebelum" 
             label="Foto Sebelum Kerja" 
             previewUrl={previewBefore} 
@@ -262,7 +262,7 @@ export default function DetailPekerjaan() {
             />
 
             {/* BAGIAN SESUDAH */}
-            <UploadFoto 
+            <UploadFotoBeforeAfter 
             id="foto-sesudah" 
             label="Foto Sesudah Kerja" 
             previewUrl={previewAfter} 

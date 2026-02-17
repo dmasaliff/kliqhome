@@ -17,11 +17,14 @@ export function DataPelanggan({ customer_name, customer_phone, service, address,
   const supabase = createClient();
   const params = useParams();
   const handleCancelOrder = async () => {
+    setIsLoading(true);
     try {
       const res = await supabase
       .from('bookings')
       .update({
         status: 'cancelled',
+        total_price: 0,
+        technician_share: 0,
       })
       .eq('id', params.id)
       .select();
@@ -38,6 +41,7 @@ export function DataPelanggan({ customer_name, customer_phone, service, address,
       setIsLoading(false);
     }
   }
+
   return (
     <div className="bg-white rounded-4xl p-5 shadow-sm space-y-4">
       <h3 className="text-[14px] font-bold uppercase tracking-wider text-black">Data Pelanggan</h3>

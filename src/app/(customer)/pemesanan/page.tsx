@@ -29,6 +29,7 @@ export default function PesanPage() {
         customer_phone,
         address,
         service,
+        keluhan,
         time_slot: selectedSlot || "Belum dipilih",
       });
       

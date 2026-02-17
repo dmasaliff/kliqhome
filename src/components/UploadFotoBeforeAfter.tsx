@@ -9,7 +9,7 @@ interface UploadProps {
   onRemove: () => void;
 }
 
-export function UploadFoto({ id, label, previewUrl, onUpload, onRemove }: UploadProps) {
+export function UploadFotoBeforeAfter({ id, label, previewUrl, onUpload, onRemove }: UploadProps) {
   return (
     <div className="bg-white rounded-4xl p-4 shadow-ms border space-y-3">
               <div className="bg-gray-100 p-2 rounded-lg flex items-center gap-2">

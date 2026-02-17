@@ -14,7 +14,8 @@ export async function submitOrder(data: {
   customer_phone: string,
   address: string,
   service: string[],
-  time_slot: string
+  time_slot: string,
+  keluhan: string,
 }) {
   const supabase = await createClient();
   
@@ -23,7 +24,7 @@ export async function submitOrder(data: {
     return total + (ditemukan ? ditemukan.harga : 0);
   }, 0);
 
-  const technicianShare = totalPrice * 0.8;
+  const technicianShare = totalPrice * 0.9;
 
   const { data: newOrder, error } = await supabase.from('bookings').insert([
     {
@@ -35,7 +36,8 @@ export async function submitOrder(data: {
         time_slot: data.time_slot,
         total_price: totalPrice,
         technician_share: technicianShare,
-        status: 'available'
+        status: 'available',
+        keluhan: data.keluhan,
     }
   ])
   .select() 
@@ -56,7 +58,7 @@ export async function submitOrder(data: {
       *Alamat:* ${data.address}
 
       *Total Bayar:* Rp ${totalPrice.toLocaleString('id-ID')}
-      *Jatah Teknisi (80%): Rp ${technicianShare.toLocaleString('id-ID')}*
+      *Jatah Teknisi (90%): Rp ${technicianShare.toLocaleString('id-ID')}*
 
       ----------------------------------
       Segera ambil orderan!

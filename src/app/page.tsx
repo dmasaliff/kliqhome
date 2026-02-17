@@ -78,7 +78,7 @@ export default function HomePage() {
       <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
         <ServiceCard 
           title="CUCI AC" 
-          price="Mulai Rp75Rb" 
+          price="Mulai Rp85Rb" 
           Icon={Snowflake} 
         />
         <ServiceCard 

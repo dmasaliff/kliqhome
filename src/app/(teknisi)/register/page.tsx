@@ -6,9 +6,10 @@ import { useState } from "react";
 import { PendingVerification } from "@/components/PendingVerification";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { UploadFoto } from "@/components/UploadFoto";
+import { UploadFotoDocument } from "@/components/UploadFotoDocument";
 import {createClient} from "@/utils/supabase/client"
 import {uploadTechniciansDocs} from "@/app/actions/uploadTechniciansDocs"
+
 
 export default function RegisterPage() {
     const [nama, setNama] = useState("");
@@ -178,7 +179,7 @@ export default function RegisterPage() {
                     <h3 className="text-[14px] font-bold uppercase tracking-wider text-black">Verifikasi Dokumen</h3>
 
                     {/* BAGIAN KTP */}
-                    <UploadFoto 
+                    <UploadFotoDocument 
                     id="foto-ktp" 
                     label="Foto KTP" 
                     previewUrl={previewKtp} 
@@ -190,7 +191,7 @@ export default function RegisterPage() {
                     />
 
                     {/* BAGIAN SELFIE */}
-                    <UploadFoto 
+                    <UploadFotoDocument
                     id="foto-selfie" 
                     label="Foto Selfie" 
                     previewUrl={previewSelfie} 
@@ -202,7 +203,7 @@ export default function RegisterPage() {
                     />
 
                     {/* BAGIAN SERTIFIKAT */}
-                    <UploadFoto 
+                    <UploadFotoDocument 
                     id="foto-sertifikat" 
                     label="Foto Sertifikat / Bukti Hasil Kerja Sebelumnya" 
                     previewUrl={previewCert} 
