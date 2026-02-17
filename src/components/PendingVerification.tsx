@@ -4,6 +4,7 @@ import { Clock, ShieldCheck, FileSearch, CheckCircle2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export function PendingVerification() {
   const router = useRouter();
@@ -122,19 +123,17 @@ export function PendingVerification() {
           </div>
         </div>
       </div>
-
-      {!isAccepted && (
-        <button 
-          onClick={() => window.location.reload()}
-          className="text-blue-600 font-semibold text-sm hover:underline"
-        >
-          Cek Status Terkini
-        </button>
-      )}
       
-      <p className="mt-12 text-xs text-slate-700">
-        Butuh bantuan cepat? Hubungi <span className="underline cursor-pointer">Admin KLIQ</span>
-      </p>
+     
+        <p className="mt-12 text-xs text-slate-700">
+          Butuh bantuan cepat? Hubungi 
+          <Link href="https://wa.me/6285726129692" className="mt-8">
+            <span className="underline cursor-pointer">
+              Admin KLIQ
+            </span>
+          </Link>
+        </p>
+      
     </div>
   );
 }
