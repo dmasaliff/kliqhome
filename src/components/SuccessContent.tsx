@@ -3,13 +3,13 @@
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
 import { SuccessCard } from '@/components/SuccessCard';
-import { useRouter } from 'next/navigation';
+
 
 export function SuccessContent() {
     const searchParams = useSearchParams();
     const amountStr = searchParams.get('amount');
+    const profileId = searchParams.get('profileId');
     const totalPendapatan = amountStr ? parseInt(amountStr) : 0;
-    const router = useRouter();
 
     return (
 
@@ -41,7 +41,7 @@ export function SuccessContent() {
         {/* Button Section */}
         <div className="w-full max-w-[320px] pb-10 mt-8">
             <button 
-            onClick={() => router.push(`/profile`)}
+            onClick={() => window.location.href = `/profile/${profileId}`}
             className="w-full bg-[#007AFF] hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-md transition-all active:scale-95"
             >
             Lihat Riwayat Pendapatan
