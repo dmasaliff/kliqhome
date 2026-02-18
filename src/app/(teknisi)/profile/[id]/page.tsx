@@ -142,9 +142,18 @@ export default function TechnicianProfile() {
                     <p>No. HP : <span className="font-medium">{profile.phone}</span></p>
                     <p>Spesialisasi : 
                         <span className="font-medium">
-                            {Array.isArray(profile.specialization) 
-                                ? profile.specialization.join(', ') 
-                                : profile.specialization}
+                            {(() => {
+                                try {
+                                const data = typeof profile.specialization === 'string' 
+                                    ? JSON.parse(profile.specialization) 
+                                    : profile.specialization;
+                                    
+                                return Array.isArray(data) ? data.join(', ') : data;
+                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                } catch (error) {
+                                return String(profile.specialization).replace(/[\[\]"]/g, '').replace(/,/g, ', ');
+                                }
+                            })()}
                         </span>
                     </p>
                     <div className="flex items-center gap-2">

@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 
 const DAFTAR_LAYANAN = [
-  { id: "cuci", label: "Cuci AC Rutin", harga: 75000 },
+  { id: "cuci", label: "Cuci AC Rutin", harga: 85000 },
   { id: "freon", label: "Tambah Freon", harga: 150000 },
   { id: "bongkar", label: "Bongkar Pasang", harga: 350000 },
   { id: "perbaikan", label: "Perbaikan", harga: 0 },
