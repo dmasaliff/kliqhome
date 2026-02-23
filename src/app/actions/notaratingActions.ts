@@ -6,12 +6,16 @@ export async function sendWhastappInvoice({
   customer_phone, 
   id, 
   total_price, 
-  technician_id 
+  technician_id,
+  additional_repairs,
+  service,
 }: { 
   customer_phone: string, 
   id: string, 
   total_price: number, 
   technician_id: string 
+  additional_repairs?: { name: string, price: number }[],
+  service?: string,
 }) {
 
     if (!customer_phone || typeof customer_phone !== 'string') {
@@ -21,7 +25,23 @@ export async function sendWhastappInvoice({
 
     try {
         const fonnteToken = process.env.FONNTE_TOKEN;
-  
+
+        const daftarLayanan: string[] = [];
+
+        if (typeof service === 'string' && service !== '') {
+            daftarLayanan.push(`- ${service}`);
+        }
+
+        if (Array.isArray(additional_repairs)) {
+            additional_repairs.forEach((item: { name: string; price: number }) => {
+                daftarLayanan.push(`- ${item.name} (Rp ${item.price.toLocaleString('id-ID')})`);
+            });
+        }
+
+        const rincianLayanan = daftarLayanan.length > 0 
+            ? daftarLayanan.join('\n') 
+            : '- Layanan Standar';
+
         const message = 
         `*NOTA SERVICE AC - KLIQ HOME* ✅
 
@@ -29,7 +49,12 @@ export async function sendWhastappInvoice({
         Berikut rincian orderan Anda:
 
         ID Order: ${id}
-        Total Bayar: Rp ${total_price?.toLocaleString('id-ID') || '0'}
+        ---------------------------
+        *Layanan:*
+        ${rincianLayanan}
+
+        *Total Bayar: Rp ${total_price?.toLocaleString('id-ID') || '0'}*
+        ---------------------------
 
         Mohon bantu kami meningkatkan kualitas layanan dengan memberikan rating untuk teknisi kami melalui link berikut:
         👉 https://kliqhome.vercel.app/rating/${technician_id}

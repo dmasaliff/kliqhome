@@ -2,19 +2,22 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import {createClient} from '@/utils/supabase/client'
+import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ phone: '', password: '' });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const supabase = createClient();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null);
 
     const formattedEmail = `kliq.${formData.phone.trim()}@gmail.com`;
 
@@ -24,7 +27,11 @@ export default function LoginPage() {
     })
 
     if (authError) {
-      alert("Login Gagal: " + authError.message)
+      if (authError.message.includes("Invalid login credentials")) {
+        setErrorMessage("Nomor HP atau kata sandi salah.");
+      } else {
+        setErrorMessage(authError.message);
+      }
       setLoading(false);
       return;
     }
@@ -37,14 +44,14 @@ export default function LoginPage() {
 
     if (profileError || !profile) {
         await supabase.auth.signOut();
-        alert("Terjadi kesalahan sistem. Akun tidak ditemukan.");
+        setErrorMessage("Akun tidak ditemukan di database teknisi.");
         setLoading(false);
         return;
     }
 
     if (!profile.is_verified) {
         await supabase.auth.signOut();
-        alert("Akun Anda sedang ditinjau. Harap tunggu verifikasi admin.");
+        setErrorMessage("Akun Anda belum diverifikasi oleh admin.");
         setLoading(false);
         return;
     }
@@ -95,7 +102,7 @@ export default function LoginPage() {
             </div>
 
             <div className="text-right">
-                <a href="#" className="text-[#007AFF] text-xs font-bold hover:underline">Lupa Sandi?</a>
+                <Link href="/forgotpassword" className="text-[#007AFF] text-xs font-bold hover:underline">Lupa Sandi?</Link>
             </div>
 
             <button 
@@ -104,6 +111,16 @@ export default function LoginPage() {
             >
               {loading ? "Masuk..." : "MASUK SEKARANG"}
             </button>
+
+            {/* TAMPILAN PESAN ERROR DI BAWAH FORM */}
+              {errorMessage && (
+                <div className="flex items-center justify-center gap-2 mt-4 p-3 bg-red-50 rounded-lg border border-red-100 animate-in fade-in slide-in-from-top-1">
+                  <AlertCircle size={16} className="text-red-500" />
+                  <p className="text-red-600 text-[12px] font-bold">
+                    {errorMessage}
+                  </p>
+                </div>
+              )}
             </form>
         </div>
 

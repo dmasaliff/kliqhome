@@ -39,6 +39,7 @@ export default function DetailPekerjaan() {
   const [isLoading, setIsLoading] = useState(false);
   const [fileBefore, setFileBefore] = useState<File | null>(null);
   const [fileAfter, setFileAfter] = useState<File | null>(null);
+  const [namaPerbaikan, setNamaPerbaikan] = useState('');
   const router = useRouter();
   const params = useParams();
   const supabase = createClient();
@@ -145,6 +146,11 @@ export default function DetailPekerjaan() {
     }
 
     try {
+
+      const perbaikanData = isPerbaikanChecked 
+      ? [{ name: namaPerbaikan, price: hargaPerbaikan }] 
+      : [];
+
       const { data: bookingData } = await supabase
         .from('bookings')
         .select('customer_phone')
@@ -164,6 +170,8 @@ export default function DetailPekerjaan() {
           total_price: totalBiaya, 
           id: orderId, 
           technician_id: orderData.technician_id,
+          additional_repairs: perbaikanData,
+          service: layananText,
         });
       } else {
         console.error("Nomor HP tidak ditemukan di database!");
@@ -216,32 +224,54 @@ export default function DetailPekerjaan() {
                     </div>
                 ))}
 
-                {/* Bagian Perbaikan (Input Manual) */}
                 <div className="pt-2 space-y-2 border-t border-gray-50 mt-2">
-                    <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3">
                     <Checkbox 
-                        id="perbaikan" 
-                        onCheckedChange={(checked) => setIsPerbaikanChecked(!!checked)}
-                        className="border-gray-300"
+                      id="perbaikan" 
+                      onCheckedChange={(checked) => {
+                        setIsPerbaikanChecked(!!checked);
+                        if (!checked) {
+                          setNamaPerbaikan('');
+                          setHargaPerbaikan(0);
+                        }
+                      }}
+                      className="border-gray-300"
                     />
-                    <label htmlFor="perbaikan" className="text-[12px] font-medium text-black">Perbaikan Lainnya (Masukkan harga manual)</label>
-                    </div>
-                    
-                    {isPerbaikanChecked && (
-                    <div className="pl-8 animate-in slide-in-from-top-1 duration-200">
-                        <p className="text-[10px] font-bold text-black mb-1">Masukkan Harga Perbaikan :</p>
-                        <div className="relative">
-                        <span className="absolute left-3 top-2 text-sm font-bold text-black">Rp</span>
+                    <label htmlFor="perbaikan" className="text-[12px] font-medium text-black">
+                      Perbaikan Lainnya (Custom)
+                    </label>
+                  </div>
+                  
+                  {isPerbaikanChecked && (
+                    <div className="pl-8 space-y-3 animate-in slide-in-from-top-1 duration-200">
+                      {/* Input Nama Perbaikan */}
+                      <div>
+                        <p className="text-[10px] font-bold text-black mb-1">Nama Perbaikan :</p>
                         <input 
+                          type="text"
+                          value={namaPerbaikan}
+                          onChange={(e) => setNamaPerbaikan(e.target.value)}
+                          className="w-full border border-blue-200 rounded-lg p-2 h-10 text-sm focus:border-blue-500 outline-none"
+                          placeholder="Contoh: Ganti Kapasitor / Las Pipa"
+                        />
+                      </div>
+
+                      {/* Input Harga Perbaikan */}
+                      <div>
+                        <p className="text-[10px] font-bold text-black mb-1">Harga Perbaikan :</p>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-sm font-bold text-black">Rp</span>
+                          <input 
                             type="number"
                             value={hargaPerbaikan === 0 ? "" : hargaPerbaikan}
                             onChange={(e) => setHargaPerbaikan(Number(e.target.value))}
                             className="w-full border border-blue-200 rounded-lg p-2 pl-10 h-10 text-sm focus:border-blue-500 outline-none"
                             placeholder="0"
-                        />
+                          />
                         </div>
+                      </div>
                     </div>
-                    )}
+                  )}
                 </div>
             </div>
         </div>

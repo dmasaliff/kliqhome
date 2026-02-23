@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { TimeSlot } from "@/components/TimeSlot";
 import { SuccessSection } from "@/components/SuccessSection";
-import { ChevronLeft, MapPin, Sun, CloudSun, Moon } from "lucide-react";
+import { ChevronLeft, Sun, CloudSun, Moon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { submitOrder } from "@/app/actions/orderActions";
