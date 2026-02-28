@@ -24,10 +24,31 @@ interface Order {
   total_price: number;
 }
 
+const MAP_LAYANAN: Record<string, string> = {
+  "cuci_05_1": "Cuci AC (0.5 - 1 PK)",
+  "cuci_15": "Cuci AC (1.5 PK)",
+  "cuci_2": "Cuci AC (2 PK)",
+  "tambah_freon": "Tambah Freon",
+  "isi_freon_05_1": "Isi Freon Full (0.5-1 PK)",
+  "isi_freon_15_2": "Isi Freon Full (1.5-2 PK)",
+  "bongkar": "Bongkar AC",
+  "bongkar_pasang_05_1": "Bongkar Pasang (0.5-1 PK)",
+  "bongkar_pasang_15_2": "Bongkar Pasang (1.5-2 PK)",
+  "perbaikan": "Perbaikan AC",
+  "pengecekan": "Pengecekan AC",
+};
+
 const DAFTAR_LAYANAN = [
-  { id: "cuci", label: "Cuci AC Rutin", harga: 85000 },
-  { id: "freon", label: "Tambah Freon", harga: 150000 },
-  { id: "bongkar", label: "Bongkar Pasang", harga: 350000 },
+  { id: "cuci_05_1", label: "Cuci AC (0.5 - 1 PK)", harga: 85000 },
+  { id: "cuci_15", label: "Cuci AC (1.5 PK)", harga: 90000 },
+  { id: "cuci_2", label: "Cuci AC (2 PK)", harga: 100000 },
+  { id: "tambah_freon", label: "Tambah Freon", harga: 250000 },
+  { id: "isi_freon_05_1", label: "Isi Freon Full (0.5-1 PK)", harga: 350000 },
+  { id: "isi_freon_15_2", label: "Isi Freon Full (1.5-2 PK)", harga: 450000 },
+  { id: "bongkar", label: "Bongkar AC", harga: 185000 },
+  { id: "bongkar_pasang_05_1", label: "Bongkar Pasang (0.5-1 PK)", harga: 450000 },
+  { id: "bongkar_pasang_15_2", label: "Bongkar Pasang (1.5-2 PK)", harga: 550000 },
+  { id: "pengecekan", label: "Pengecekan AC", harga: 75000 },
 ];
 
 export default function DetailPekerjaan() {
@@ -48,22 +69,56 @@ export default function DetailPekerjaan() {
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   const hitungTotal = () => {
-    const totalTetap = selectedServices.reduce((total, serviceId) => {
-      const service = DAFTAR_LAYANAN.find((s) => s.id === serviceId);
-      return total + (service ? service.harga : 0);
+    // 1. Cek apakah ada layanan tindakan (selain pengecekan)
+    // Kita tambahkan isPerbaikanChecked karena di sini teknisi bisa input manual
+    const hasActionService = selectedServices.some(id => 
+      id.startsWith("cuci_") || 
+      id.startsWith("isi_freon_") || 
+      id.startsWith("tambah_freon") ||
+      id.startsWith("bongkar")
+    ) || isPerbaikanChecked; 
+
+    // 2. Hitung total dari selectedServices
+    const totalTetap = selectedServices.reduce((total, selectedId) => {
+      const service = DAFTAR_LAYANAN.find((s) => s.id === selectedId);
+      
+      if (service) {
+        // Jika ada tindakan lain, harga pengecekan jadi 0
+        if (hasActionService && selectedId === "pengecekan") {
+          return total + 0;
+        }
+        return total + service.harga;
+      }
+      return total;
     }, 0);
-    
+  
+    // 3. Tambahkan harga perbaikan custom (jika ada)
     return totalTetap + (isPerbaikanChecked ? hargaPerbaikan : 0);
   };
   const totalBiaya = hitungTotal();
 
   const handleCheckboxChange = (id: string) => {
-    setSelectedServices((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setSelectedServices((prev) => {
+      if (prev.includes(id)) return prev.filter((item: string) => item !== id);
+      let tempServices = [...prev];
+
+      if (id === "pengecekan") {
+        setIsPerbaikanChecked(false); // Matikan custom perbaikan
+        return ["pengecekan"];
+      }
+
+      // 3. Logic: Jika pilih layanan apapun (selain pengecekan), hapus "pengecekan"
+      if (id !== "pengecekan") {
+        tempServices = tempServices.filter((item) => item !== "pengecekan");
+      }
+
+      return [...tempServices, id];
+    });
   };
 
-  const layananText = Array.isArray(orderData?.service) ? orderData.service.join(", ") : (orderData?.service || "Layanan tidak tersedia");
+  const layananText = Array.isArray(orderData?.service) 
+    ? orderData.service.map(id => MAP_LAYANAN[id] || id).join(", ") 
+    : (MAP_LAYANAN[orderData?.service as unknown as string] || orderData?.service || "Layanan tidak tersedia");
 
   useEffect(() => {
     async function getOrderDetail() {
@@ -112,14 +167,25 @@ export default function DetailPekerjaan() {
     setIsLoading(true);
 
     try {
-      const urlBefore = await uploadPhoto(fileBefore, 'before');
+     const urlBefore = await uploadPhoto(fileBefore, 'before');
       const urlAfter = await uploadPhoto(fileAfter, 'after');
       const totalPrice = totalBiaya;
-      const technicianShare = totalPrice * 0.9;
 
-      console.log("Mencoba update booking dengan ID:", params.id);
-      console.log("URL Before:", urlBefore);
-      console.log("URL After:", urlAfter);
+      // --- LOGIC PROMO 100% ---
+      // Ambil ID teknisi dari orderData
+      const technicianId = orderData?.technician_id;
+      
+      // Cek jumlah orderan completed teknisi ini
+      const { count } = await supabase
+        .from('bookings')
+        .select('*', { count: 'exact', head: true })
+        .eq('technician_id', technicianId)
+        .eq('status', 'completed');
+
+      // Jika orderan ke 1, 2, 3 (count 0, 1, 2), dapet 100%
+      const technicianShare = (count !== null && count < 3) 
+        ? totalPrice 
+        : totalPrice * 0.9;
 
       const res = await supabase
         .from('bookings')
@@ -127,17 +193,16 @@ export default function DetailPekerjaan() {
           photo_before: urlBefore,
           photo_after: urlAfter,
           status: 'completed',
-          total_price : totalPrice,
+          total_price: totalPrice,
           technician_share: technicianShare,
+          // Simpan juga layanan apa saja yang akhirnya dikerjakan
+          service_done: selectedServices.map(id => DAFTAR_LAYANAN.find(s => s.id === id)?.label).filter(Boolean)
         })
-        .eq('id', params.id)
-        .select();
+        .eq('id', params.id);
 
-      console.log("Full Respon Supabase:", res);
       if (res.error) throw res.error;
       
-      const total = hitungTotal(); 
-      router.push(`/success?amount=${total}&id=${orderId}`);
+      router.push(`/success?amount=${totalPrice}&id=${params.id}`);
 
     } catch (err) {
       alert("Gagal menyelesaikan order: " + (err as Error).message);
@@ -215,6 +280,7 @@ export default function DetailPekerjaan() {
                     <div key={item.id} className="flex items-center space-x-3">
                         <Checkbox 
                         id={item.id} 
+                        checked={selectedServices.includes(item.id)}
                         onCheckedChange={() => handleCheckboxChange(item.id)}
                         className="border-gray-300 rounded" 
                     />
@@ -228,9 +294,12 @@ export default function DetailPekerjaan() {
                   <div className="flex items-center space-x-3">
                     <Checkbox 
                       id="perbaikan" 
+                      checked={isPerbaikanChecked}
                       onCheckedChange={(checked) => {
                         setIsPerbaikanChecked(!!checked);
-                        if (!checked) {
+                        if (checked) {
+                          setSelectedServices(prev => prev.filter(id => id !== "pengecekan"));
+                        } else {
                           setNamaPerbaikan('');
                           setHargaPerbaikan(0);
                         }

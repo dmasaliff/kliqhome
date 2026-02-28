@@ -20,6 +20,20 @@ interface Order {
   total_price: number;
 }
 
+const MAP_LAYANAN: Record<string, string> = {
+  "cuci_05_1": "Cuci AC (0.5 - 1 PK)",
+  "cuci_15": "Cuci AC (1.5 PK)",
+  "cuci_2": "Cuci AC (2 PK)",
+  "tambah_freon": "Tambah Freon",
+  "isi_freon_05_1": "Isi Freon Full (0.5-1 PK)",
+  "isi_freon_15_2": "Isi Freon Full (1.5-2 PK)",
+  "bongkar": "Bongkar AC",
+  "bongkar_pasang_05_1": "Bongkar Pasang (0.5-1 PK)",
+  "bongkar_pasang_15_2": "Bongkar Pasang (1.5-2 PK)",
+  "perbaikan": "Perbaikan AC",
+  "pengecekan": "Pengecekan AC",
+};
+
 export default function OrderPage() {
   const router = useRouter();
   const params = useParams();
@@ -90,9 +104,10 @@ export default function OrderPage() {
     setLoading(false);
   }
 
+  // Ubah bagian ini
   const layananText = Array.isArray(orderData?.service) 
-    ? orderData.service.join(", ") 
-    : (orderData?.service || "Layanan tidak tersedia");
+    ? orderData.service.map(id => MAP_LAYANAN[id] || id).join(", ") 
+    : (MAP_LAYANAN[orderData?.service as unknown as string] || orderData?.service || "Layanan tidak tersedia");
 
   if (fetching || !orderData) {
     return (

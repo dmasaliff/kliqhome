@@ -11,6 +11,20 @@ import {createClient} from "@/utils/supabase/client"
 import { uploadTransferProof } from "@/app/actions/uploadTransfer"
 import { getTechnicianFinance, getTechnicianHistory, getTechnicianProfile } from "@/app/actions/technicianProfile"
 
+const DAFTAR_LAYANAN = [
+  { id: "cuci_05_1", label: "Cuci AC (0.5 - 1 PK)", harga: 85000 },
+  { id: "cuci_15", label: "Cuci AC (1.5 PK)", harga: 90000 },
+  { id: "cuci_2", label: "Cuci AC (2 PK)", harga: 100000 },
+  { id: "tambah_freon", label: "Tambah Freon", harga: 250000 },
+  { id: "isi_freon_05_1", label: "Isi Freon Full (0.5-1 PK)", harga: 350000 },
+  { id: "isi_freon_15_2", label: "Isi Freon Full (1.5-2 PK)", harga: 450000 },
+  { id: "bongkar", label: "Bongkar AC", harga: 185000 },
+  { id: "bongkar_pasang_05_1", label: "Bongkar Pasang (0.5-1 PK)", harga: 450000 },
+  { id: "bongkar_pasang_15_2", label: "Bongkar Pasang (1.5-2 PK)", harga: 550000 },
+  { id: "perbaikan", label: "Perbaikan AC", harga: 0 },
+  { id: "pengecekan", label: "Pengecekan AC", harga: 75000 },
+];
+
 export default function TechnicianProfile() {
     const router = useRouter();
     const supabase = createClient();
@@ -208,7 +222,12 @@ export default function TechnicianProfile() {
                             day: 'numeric', month: 'short', year: 'numeric'
                             })}
                         </p>
-                        <h4 className="font-bold text-lg mt-2 text-gray-800">{item.service}</h4>
+                        <h4 className="font-bold text-lg mt-2 text-gray-800">
+                            {item.service.map(id => {
+                                const item = DAFTAR_LAYANAN.find(layanan => layanan.id === id);
+                                return item ? item.label : id;
+                            }).join(", ")}
+                        </h4>
                         </div>
                         <span className="text-xl font-black text-blue-600">
                         {formatIDR(item.total_price)}

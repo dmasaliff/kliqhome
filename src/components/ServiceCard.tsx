@@ -5,9 +5,10 @@ interface ServiceProps {
   title: string;
   price: string;
   Icon: LucideIcon;
+  description: string;
 }
 
-export function ServiceCard({ title, price, Icon }: ServiceProps) {
+export function ServiceCard({ title, price, Icon, description }: ServiceProps) {
   return (
     <Card className="rounded-2xl border-none shadow-sm h-48 flex items-center justify-center bg-white">
       <CardContent className="flex flex-col items-center p-0 text-center">
@@ -19,8 +20,12 @@ export function ServiceCard({ title, price, Icon }: ServiceProps) {
           {title}
         </h3>
         
-        <p className="text-[11px] text-gray-500 font-medium">
+        <p className="text-[11px] text-black font-medium">
           {price}
+        </p>
+
+        <p className="text-[11px] text-black font-medium">
+          {description}
         </p>
       </CardContent>
     </Card>

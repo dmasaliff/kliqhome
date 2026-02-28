@@ -6,7 +6,6 @@ export async function sendWhastappInvoice({
   customer_phone, 
   id, 
   total_price, 
-  technician_id,
   additional_repairs,
   service,
 }: { 
@@ -57,7 +56,7 @@ export async function sendWhastappInvoice({
         ---------------------------
 
         Mohon bantu kami meningkatkan kualitas layanan dengan memberikan rating untuk teknisi kami melalui link berikut:
-        👉 https://kliqhome.vercel.app/rating/${technician_id}
+        👉 https://kliqhome.vercel.app/rating/${id}
 
         Simpan nota digital ini sebagai bukti garansi. 
         KLIQ Home - Solusi Dingin Tanpa Ribet! ❄️`;

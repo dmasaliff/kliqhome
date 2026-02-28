@@ -3,10 +3,17 @@
 import { createClient } from '@/utils/supabase/server'
 
 const DAFTAR_LAYANAN = [
-  { id: "cuci", label: "Cuci AC Rutin", harga: 85000 },
-  { id: "freon", label: "Tambah Freon", harga: 150000 },
-  { id: "bongkar", label: "Bongkar Pasang", harga: 350000 },
-  { id: "perbaikan", label: "Perbaikan", harga: 0 },
+  { id: "cuci_05_1", label: "Cuci AC (0.5 - 1 PK)", harga: 85000 },
+  { id: "cuci_15", label: "Cuci AC (1.5 PK)", harga: 90000 },
+  { id: "cuci_2", label: "Cuci AC (2 PK)", harga: 100000 },
+  { id: "tambah_freon", label: "Tambah Freon", harga: 250000 },
+  { id: "isi_freon_05_1", label: "Isi Freon Full (0.5-1 PK)", harga: 350000 },
+  { id: "isi_freon_15_2", label: "Isi Freon Full (1.5-2 PK)", harga: 450000 },
+  { id: "bongkar", label: "Bongkar AC", harga: 185000 },
+  { id: "bongkar_pasang_05_1", label: "Bongkar Pasang (0.5-1 PK)", harga: 450000 },
+  { id: "bongkar_pasang_15_2", label: "Bongkar Pasang (1.5-2 PK)", harga: 550000 },
+  { id: "perbaikan", label: "Perbaikan AC", harga: 0 },
+  { id: "pengecekan", label: "Pengecekan AC", harga: 75000 },
 ];
 
 export async function submitOrder(data: {
@@ -17,17 +24,41 @@ export async function submitOrder(data: {
   time_slot: string,
   keluhan: string,
 }) {
+
+  const hasActionService = data.service.some(id => 
+    id.startsWith("cuci_") || 
+    id.startsWith("isi_freon_") || 
+    id.startsWith("tambah_freon") ||
+    id.startsWith("bongkar")
+  );
+
+  const namaLayananLengkap = data.service.map(id => {
+    const item = DAFTAR_LAYANAN.find(layanan => layanan.id === id);
+    return item ? item.label : id;
+  }).join(", ");
+
   const supabase = await createClient();
+  const totalPrice = data.service.reduce((total, selectedId) => {
+  const layanan = DAFTAR_LAYANAN.find(item => item.id === selectedId);
   
-  const totalPrice = data.service.reduce((total, labelLayanan) => {
-    const ditemukan = DAFTAR_LAYANAN.find(item => item.label === labelLayanan);
-    return total + (ditemukan ? ditemukan.harga : 0);
-  }, 0);
+  if (layanan) {
+    if (hasActionService && selectedId === "pengecekan") {
+      return total + 0;
+    }
+    return total + layanan.harga;
+  }
+  return total;
+}, 0);
+
+  console.log("Service yang diterima:", data.service);
+  console.log("Total Harga terhitung:", totalPrice);
 
   const technicianShare = totalPrice * 0.9;
 
-  const { data: newOrder, error } = await supabase.from('bookings').insert([
-    {
+  const { data: newOrder, error } = await supabase
+    .from('bookings')
+    .insert([
+      {
         customer_name: data.customer_name,
         customer_phone: data.customer_phone,
         address: data.address,
@@ -35,13 +66,13 @@ export async function submitOrder(data: {
         booking_date: new Date().toISOString().split('T')[0],
         time_slot: data.time_slot,
         total_price: totalPrice,
-        technician_share: technicianShare,
-        status: 'available',
+        technician_share: technicianShare, 
+        status: 'available', // Status awal saat dipesan customer
         keluhan: data.keluhan,
-    }
-  ])
-  .select() 
-  .single();
+      }
+    ])
+    .select() 
+    .single();
 
   if (error) {
     console.error('Database Error:', error.message)
@@ -53,7 +84,7 @@ export async function submitOrder(data: {
     const msgTeknisi = 
       `🚨 *ORDER BARU KLIQ HOME* 🚨
 
-      *Layanan:* ${data.service.join(', ')}
+      *Layanan:* ${namaLayananLengkap}
       *Jadwal:* ${data.time_slot}
       *Alamat:* ${data.address}
 
@@ -67,7 +98,7 @@ export async function submitOrder(data: {
 
     const msgCustomer = `Halo Kak *${data.customer_name}*! 👋\n\n` +
       `Terima kasih sudah memesan di *KLIQ Home*. Pesanan Kakak sudah kami terima:\n\n` +
-      `🛠 *Layanan:* ${data.service.join(', ')}\n` +
+      `🛠 *Layanan:* ${namaLayananLengkap}\n` +
       `⏰ *Jadwal:* ${data.time_slot}\n` +
       `📍 *Alamat:* ${data.address}\n\n` +
       `Teknisi kami akan segera menghubungi Kakak dalam beberapa menit untuk konfirmasi kedatangan. Mohon ditunggu ya! 😊`;

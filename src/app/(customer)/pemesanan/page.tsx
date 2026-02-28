@@ -42,12 +42,40 @@ export default function PesanPage() {
   }
 };
 
-  const handleLayananChange = (item: string) => {
-    setService((prev) =>
-      prev.includes(item) 
-        ? prev.filter((i) => i !== item)
-        : [...prev, item]
-    );
+  const handleLayananChange = (idBaru: string) => {
+    setService((prev) => {
+      if (prev.includes(idBaru)) return prev.filter((id) => id !== idBaru);
+      let tempService = [...prev];
+
+      if (["cuci_05_1", "cuci_15", "cuci_2"].includes(idBaru)) {
+        tempService = tempService.filter(id => !["cuci_05_1", "cuci_15", "cuci_2"].includes(id));
+      }
+
+      if (["tambah_freon", "isi_freon_05_1", "isi_freon_15_2"].includes(idBaru)) {
+        tempService = tempService.filter(id => 
+          !["tambah_freon", "isi_freon_05_1", "isi_freon_15_2"].includes(id)
+        );
+      }
+
+      if (["bongkar", "bongkar_pasang_05_1", "bongkar_pasang_15_2"].includes(idBaru)) {
+        tempService = tempService.filter(id => 
+          !["bongkar", "bongkar_pasang_05_1", "bongkar_pasang_15_2"].includes(id)
+        );
+      }
+
+      if (idBaru === "pengecekan") {
+        // Jika pilih pengecekan, hapus ID perbaikan
+        tempService = tempService.filter(id => id !== "perbaikan");
+      }
+      if (idBaru === "perbaikan") {
+        // Jika pilih perbaikan, hapus ID pengecekan (karena sudah otomatis dicek)
+        tempService = tempService.filter(id => id !== "pengecekan");
+      }
+
+    const newState = [...tempService, idBaru];
+    console.log("Daftar Layanan Saat Ini:", newState); // Tambahkan ini!
+    return newState;
+    });
   };
 
   const isFormValid = 
@@ -106,25 +134,142 @@ export default function PesanPage() {
         </div>
 
         {/* Pilih Layanan */}
-        <div className="border border-blue-300 rounded-xl p-4 space-y-3">
-          <h3 className="text-xs font-bold uppercase">Pilih Layanan</h3>
-          {["Cuci AC Rutin", "Tambah Freon", "Perbaikan", "Bongkar Pasang"].map((item) => (
-            <div key={item} className="flex items-center space-x-3">
-              <Checkbox 
-                onCheckedChange={() => handleLayananChange(item)}
-                id={item} 
-                className="border-blue-300 data-[state=checked]:bg-blue-500" 
-              />
-              <label htmlFor={item} className="text-sm font-medium">{item}</label>
+        <div className="border border-blue-300 rounded-xl p-4 space-y-4 bg-white shadow-sm">
+          <h3 className="text-xs font-bold uppercase text-black tracking-wider">Pilih Layanan & Detail PK</h3>
+          <div className="space-y-4">
+    
+            {/* 1. CUCI AC */}
+            <div className="space-y-2">
+              <div className="flex items-center space-x-3">
+                <Checkbox 
+                  id="cat_cuci" 
+                  onCheckedChange={(checked) => {
+                    if(checked) {
+                      handleLayananChange("cuci_05_1"); // Default ID saat dicentang
+                    } else {
+                      setService((prev) => prev.filter(id => !id.startsWith("cuci_")));
+                    }
+                  }}
+                  // Checkbox menyala jika salah satu ID cuci ada di state
+                  checked={service.some(id => id.startsWith("cuci_"))}
+                  className="border-blue-300 data-[state=checked]:bg-blue-500" 
+                />
+                <label htmlFor="cat_cuci" className="text-sm font-semibold">Cuci AC Rutin</label>
+              </div>
+              <select 
+                disabled={!service.some(id => id.startsWith("cuci_"))}
+                onChange={(e) => handleLayananChange(e.target.value)} 
+                value={service.find(id => id.startsWith("cuci_")) || "cuci_05_1"}
+                className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50 outline-none disabled:opacity-50"
+              >
+                <option value="cuci_05_1">0.5 - 1 PK (Rp85.000)</option>
+                <option value="cuci_15">1.5 PK (Rp90.000)</option>
+                <option value="cuci_2">2 PK (Rp100.000)</option>
+              </select>
             </div>
-          ))}
-          <div className="pt-2">
-            <label className="text-[10px] font-bold">KELUHAN :</label>
+
+            {/* 2. FREON */}
+            <div className="space-y-2">
+              <div className="flex items-center space-x-3">
+                <Checkbox 
+                  id="cat_freon" 
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      handleLayananChange("tambah_freon"); 
+                    } else {
+                      setService((prev) => prev.filter(id => 
+                        id !== "tambah_freon" && id !== "isi_freon_05_1" && id !== "isi_freon_15_2"
+                      ));
+                    }
+                  }}
+                  checked={service.some(id => id.includes("freon"))}
+                  className="border-blue-300 data-[state=checked]:bg-blue-500" 
+                />
+                <label htmlFor="cat_freon" className="text-sm font-semibold">Freon (Tambah/Isi)</label>
+              </div>
+              <select 
+                disabled={!service.some(id => id.includes("freon"))}
+                onChange={(e) => handleLayananChange(e.target.value)}
+                value={service.find(id => id.includes("freon")) || "tambah_freon"}
+                className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50 outline-none disabled:opacity-50"
+              >
+                <option value="tambah_freon">Tambah Freon (Rp250.000)</option>
+                <option value="isi_freon_05_1">Isi Full 0.5 - 1 PK (Rp350.000)</option>
+                <option value="isi_freon_15_2">Isi Full 1.5 - 2 PK (Rp450.000)</option>
+              </select>
+            </div>
+
+            {/* 3. BONGKAR PASANG */}
+            <div className="space-y-2">
+              <div className="flex items-center space-x-3">
+                <Checkbox 
+                  id="cat_bp" 
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      handleLayananChange("bongkar"); 
+                    } else {
+                      setService((prev) => prev.filter(id => 
+                        !id.includes("bongkar")
+                      ));
+                    }
+                  }}
+                  checked={service.some(id => id.includes("bongkar"))}
+                  className="border-blue-300 data-[state=checked]:bg-blue-500" 
+                />
+                <label htmlFor="cat_bp" className="text-sm font-semibold">Bongkar Pasang</label>
+              </div>
+              <select 
+                disabled={!service.some(id => id.includes("bongkar"))}
+                onChange={(e) => handleLayananChange(e.target.value)}
+                value={service.find(id => id.includes("bongkar")) || "bongkar"}
+                className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50 outline-none disabled:opacity-50"
+              >
+                <option value="bongkar">Bongkar Saja (Rp185.000)</option>
+                <option value="bongkar_pasang_05_1">Pasang Baru 0.5 - 1 PK (Rp450.000)</option>
+                <option value="bongkar_pasang_15_2">Pasang Baru 1.5 - 2 PK (Rp550.000)</option>
+              </select>
+            </div>
+
+            {/* 4. PERBAIKAN & PENGECEKAN (ID: pengecekan / perbaikan) */}
+            <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <Checkbox 
+                    id="pengecekan" 
+                    onCheckedChange={() => handleLayananChange("pengecekan")}
+                    checked={service.includes("pengecekan")} // Pastikan state sync
+                    className="border-blue-300 data-[state=checked]:bg-blue-500" 
+                  />
+                  <div className="flex flex-col">
+                    <label htmlFor="pengecekan" className="text-sm font-semibold">Pengecekan AC</label>
+                    <span className="text-[10px] text-red-500 italic">
+                      Rp75.000 (Gratis jika lanjut tindakan perbaikan/cuci)
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <Checkbox 
+                    id="perbaikan" 
+                    checked={service.includes("perbaikan")} // Pastikan state sync
+                    onCheckedChange={() => handleLayananChange("perbaikan")}
+                    className="border-blue-300 data-[state=checked]:bg-blue-500" 
+                  />
+                  <div className="flex flex-col">
+                    <label htmlFor="perbaikan" className="text-sm font-semibold">Perbaikan (Troubleshoot)</label>
+                    <span className="text-[10px] text-gray-500 italic">Harga estimasi teknisi di lokasi</span>
+                  </div>
+                </div>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-blue-100">
+            <label className="text-[10px] font-bold text-gray-800 uppercase tracking-widest">Keluhan Tambahan :</label>
             <Textarea 
               value={keluhan}
               onChange={(e) => setKeluhan(e.target.value)}
-              className="mt-1 border-blue-300 rounded-lg min-h-15"
-              placeholder="Ceritakan masalah AC anda..." />
+              className="mt-1 border-blue-200 rounded-lg min-h-20 text-sm focus:ring-blue-500"
+              placeholder="Contoh: AC berisik, air menetes, atau kode error..." 
+            />
           </div>
         </div>
 
