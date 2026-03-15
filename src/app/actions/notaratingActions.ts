@@ -7,14 +7,14 @@ export async function sendWhastappInvoice({
   id, 
   total_price, 
   additional_repairs,
-  service,
+  service_details,
 }: { 
   customer_phone: string, 
   id: string, 
   total_price: number, 
   technician_id: string 
   additional_repairs?: { name: string, price: number }[],
-  service?: string,
+  service_details?: { label: string, price: number }[],
 }) {
 
     if (!customer_phone || typeof customer_phone !== 'string') {
@@ -27,8 +27,10 @@ export async function sendWhastappInvoice({
 
         const daftarLayanan: string[] = [];
 
-        if (typeof service === 'string' && service !== '') {
-            daftarLayanan.push(`- ${service}`);
+        if (Array.isArray(service_details)) {
+            service_details.forEach((item) => {
+                daftarLayanan.push(`- ${item.label} (Rp ${item.price.toLocaleString('id-ID')})`);
+            });
         }
 
         if (Array.isArray(additional_repairs)) {

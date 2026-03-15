@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -55,18 +55,32 @@ export default function DetailPekerjaan() {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [previewBefore, setPreviewBefore] = useState<string | null>(null);
   const [previewAfter, setPreviewAfter] = useState<string | null>(null);
-  const [hargaPerbaikan, setHargaPerbaikan] = useState<number>(0);
   const [isPerbaikanChecked, setIsPerbaikanChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [fileBefore, setFileBefore] = useState<File | null>(null);
   const [fileAfter, setFileAfter] = useState<File | null>(null);
-  const [namaPerbaikan, setNamaPerbaikan] = useState('');
+  const [listPerbaikan, setListPerbaikan] = useState([{ nama: '', harga: 0 }]);
   const router = useRouter();
   const params = useParams();
   const supabase = createClient();
   const [orderData, setOrderData] = useState<Order | null>(null);
   const [fetching, setFetching] = useState(true);
   const [checkingAuth, setCheckingAuth] = useState(true);
+
+  const tambahPerbaikan = () => {
+    setListPerbaikan([...listPerbaikan, { nama: '', harga: 0 }]);
+  };
+
+  const hapusPerbaikan = (index: number) => {
+    const newList = listPerbaikan.filter((_, i) => i !== index);
+    setListPerbaikan(newList.length > 0 ? newList : [{ nama: '', harga: 0 }]);
+  };
+
+  const handleUpdatePerbaikan = (index: number, field: 'nama' | 'harga', value: string | number) => {
+    const newList = [...listPerbaikan];
+    newList[index] = { ...newList[index], [field]: value };
+    setListPerbaikan(newList);
+  };
 
   const hitungTotal = () => {
     // 1. Cek apakah ada layanan tindakan (selain pengecekan)
@@ -92,8 +106,12 @@ export default function DetailPekerjaan() {
       return total;
     }, 0);
   
-    // 3. Tambahkan harga perbaikan custom (jika ada)
-    return totalTetap + (isPerbaikanChecked ? hargaPerbaikan : 0);
+    const totalCustom = isPerbaikanChecked 
+      ? listPerbaikan.reduce((sum, item) => sum + (item.harga || 0), 0)
+      : 0;
+
+    return totalTetap + totalCustom;
+
   };
   const totalBiaya = hitungTotal();
 
@@ -212,9 +230,20 @@ export default function DetailPekerjaan() {
 
     try {
 
-      const perbaikanData = isPerbaikanChecked 
-      ? [{ name: namaPerbaikan, price: hargaPerbaikan }] 
-      : [];
+      const serviceDetails = selectedServices.map(id => {
+        const item = DAFTAR_LAYANAN.find(s => s.id === id);
+        return {
+          label: item?.label || "Layanan",
+          price: item?.harga || 0
+        };
+      });
+
+      const additionalRepairs = isPerbaikanChecked 
+        ? listPerbaikan.filter(item => item.nama !== '').map(item => ({
+            name: item.nama,
+            price: item.harga
+          }))
+        : [];
 
       const { data: bookingData } = await supabase
         .from('bookings')
@@ -235,8 +264,8 @@ export default function DetailPekerjaan() {
           total_price: totalBiaya, 
           id: orderId, 
           technician_id: orderData.technician_id,
-          additional_repairs: perbaikanData,
-          service: layananText,
+          additional_repairs: additionalRepairs,
+          service_details: serviceDetails,
         });
       } else {
         console.error("Nomor HP tidak ditemukan di database!");
@@ -299,9 +328,6 @@ export default function DetailPekerjaan() {
                         setIsPerbaikanChecked(!!checked);
                         if (checked) {
                           setSelectedServices(prev => prev.filter(id => id !== "pengecekan"));
-                        } else {
-                          setNamaPerbaikan('');
-                          setHargaPerbaikan(0);
                         }
                       }}
                       className="border-gray-300"
@@ -312,33 +338,53 @@ export default function DetailPekerjaan() {
                   </div>
                   
                   {isPerbaikanChecked && (
-                    <div className="pl-8 space-y-3 animate-in slide-in-from-top-1 duration-200">
-                      {/* Input Nama Perbaikan */}
-                      <div>
-                        <p className="text-[10px] font-bold text-black mb-1">Nama Perbaikan :</p>
-                        <input 
-                          type="text"
-                          value={namaPerbaikan}
-                          onChange={(e) => setNamaPerbaikan(e.target.value)}
-                          className="w-full border border-blue-200 rounded-lg p-2 h-10 text-sm focus:border-blue-500 outline-none"
-                          placeholder="Contoh: Ganti Kapasitor / Las Pipa"
-                        />
-                      </div>
+                    <div className="space-y-4 animate-in slide-in-from-top-2 duration-200">
+                      {listPerbaikan.map((item, index) => (
+                        <div key={index} className="pl-6 relative space-y-3 border-l-2 border-blue-100 pb-2">
+                          {listPerbaikan.length > 1 && (
+                            <button 
+                              onClick={() => hapusPerbaikan(index)}
+                              className="absolute -left-3 top-0 bg-red-100 text-red-600 rounded-full p-1"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          )}
+                          
+                          <div>
+                            <p className="text-[10px] font-bold text-gray-500 mb-1 uppercase">Item {index + 1}:</p>
+                            <input 
+                              type="text"
+                              value={item.nama}
+                              onChange={(e) => handleUpdatePerbaikan(index, 'nama', e.target.value)}
+                              className="w-full border border-gray-200 rounded-lg p-2 h-10 text-sm focus:border-blue-500 outline-none"
+                              placeholder="Nama perbaikan (Ganti Kapasitor, dll)"
+                            />
+                          </div>
 
-                      {/* Input Harga Perbaikan */}
-                      <div>
-                        <p className="text-[10px] font-bold text-black mb-1">Harga Perbaikan :</p>
-                        <div className="relative">
-                          <span className="absolute left-3 top-2 text-sm font-bold text-black">Rp</span>
-                          <input 
-                            type="number"
-                            value={hargaPerbaikan === 0 ? "" : hargaPerbaikan}
-                            onChange={(e) => setHargaPerbaikan(Number(e.target.value))}
-                            className="w-full border border-blue-200 rounded-lg p-2 pl-10 h-10 text-sm focus:border-blue-500 outline-none"
-                            placeholder="0"
-                          />
+                          <div>
+                            <div className="relative">
+                              <span className="absolute left-3 top-2 text-sm font-bold text-black">Rp</span>
+                              <input 
+                                type="number"
+                                inputMode="numeric"
+                                value={item.harga === 0 ? "" : item.harga}
+                                onChange={(e) => handleUpdatePerbaikan(index, 'harga', Number(e.target.value))}
+                                className="w-full border border-gray-200 rounded-lg p-2 pl-10 h-10 text-sm focus:border-blue-500 outline-none"
+                                placeholder="0"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      ))}
+                      
+                      <Button 
+                        type="button"
+                        variant="outline"
+                        onClick={tambahPerbaikan}
+                        className="w-full border-dashed border-blue-300 text-blue-600 flex items-center gap-2 h-10 text-xs hover:bg-blue-50"
+                      >
+                        <Plus size={14} /> Tambah Item Perbaikan
+                      </Button>
                     </div>
                   )}
                 </div>
