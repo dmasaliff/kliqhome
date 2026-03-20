@@ -66,6 +66,7 @@ export default function DetailPekerjaan() {
   const [orderData, setOrderData] = useState<Order | null>(null);
   const [fetching, setFetching] = useState(true);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [serviceQtys, setServiceQtys] = useState<Record<string, number>>({});
 
   const tambahPerbaikan = () => {
     setListPerbaikan([...listPerbaikan, { nama: '', harga: 0 }]);
@@ -90,18 +91,19 @@ export default function DetailPekerjaan() {
       id.startsWith("isi_freon_") || 
       id.startsWith("tambah_freon") ||
       id.startsWith("bongkar")
-    ) || isPerbaikanChecked; 
+    ) || (isPerbaikanChecked && listPerbaikan.some(item => item.nama !== "")); 
 
     // 2. Hitung total dari selectedServices
     const totalTetap = selectedServices.reduce((total, selectedId) => {
       const service = DAFTAR_LAYANAN.find((s) => s.id === selectedId);
+      const qty = serviceQtys[selectedId] || 1;
       
       if (service) {
         // Jika ada tindakan lain, harga pengecekan jadi 0
         if (hasActionService && selectedId === "pengecekan") {
           return total + 0;
         }
-        return total + service.harga;
+        return total + (service.harga * qty);
       }
       return total;
     }, 0);
@@ -117,26 +119,24 @@ export default function DetailPekerjaan() {
 
   const handleCheckboxChange = (id: string) => {
     setSelectedServices((prev) => {
-      if (prev.includes(id)) return prev.filter((item: string) => item !== id);
-      let tempServices = [...prev];
-
-      if (id === "pengecekan") {
-        setIsPerbaikanChecked(false); // Matikan custom perbaikan
-        return ["pengecekan"];
+      if (prev.includes(id)) {
+        const newQtys = { ...serviceQtys };
+        delete newQtys[id];
+        setServiceQtys(newQtys);
+        return prev.filter((item: string) => item !== id);
       }
-
-      // 3. Logic: Jika pilih layanan apapun (selain pengecekan), hapus "pengecekan"
-      if (id !== "pengecekan") {
-        tempServices = tempServices.filter((item) => item !== "pengecekan");
-      }
-
-      return [...tempServices, id];
+      setServiceQtys({ ...serviceQtys, [id]: 1 });
+      return [...prev, id];
     });
   };
 
   const layananText = Array.isArray(orderData?.service) 
-    ? orderData.service.map(id => MAP_LAYANAN[id] || id).join(", ") 
-    : (MAP_LAYANAN[orderData?.service as unknown as string] || orderData?.service || "Layanan tidak tersedia");
+  ? orderData.service.map(item => {
+      const pureId = item.split(" (")[0];
+      const unitSuffix = item.includes(" (") ? " (" + item.split(" (")[1] : "";
+      return (MAP_LAYANAN[pureId] || pureId) + unitSuffix;
+    }).join(", ") 
+  : "Layanan tidak tersedia";
 
   useEffect(() => {
     async function getOrderDetail() {
@@ -213,7 +213,6 @@ export default function DetailPekerjaan() {
           status: 'completed',
           total_price: totalPrice,
           technician_share: technicianShare,
-          // Simpan juga layanan apa saja yang akhirnya dikerjakan
           service_done: selectedServices.map(id => DAFTAR_LAYANAN.find(s => s.id === id)?.label).filter(Boolean)
         })
         .eq('id', params.id);
@@ -306,17 +305,37 @@ export default function DetailPekerjaan() {
             <h3 className="text-[14px] font-bold uppercase tracking-wider text-black">Input Hasil Kerja</h3>
             <div className="space-y-3">
                 {DAFTAR_LAYANAN.map((item) => (
-                    <div key={item.id} className="flex items-center space-x-3">
-                        <Checkbox 
+                  <div key={item.id} className="space-y-2 border-b border-gray-50 pb-2">
+                    <div className="flex items-center space-x-3">
+                      <Checkbox 
                         id={item.id} 
                         checked={selectedServices.includes(item.id)}
                         onCheckedChange={() => handleCheckboxChange(item.id)}
                         className="border-gray-300 rounded" 
-                    />
-                    <label htmlFor={item.id} className="text-[12px] font-medium">
+                      />
+                      <label htmlFor={item.id} className="text-[12px] font-medium flex-1">
                         {item.label} <span className="text-gray-500 text-[10px]">(Rp {item.harga.toLocaleString()})</span>
-                    </label>
+                      </label>
                     </div>
+
+                    {/* Munculkan Counter jika layanan dipilih */}
+                    {selectedServices.includes(item.id) && item.id !== "perbaikan" && (
+                      <div className="pl-8 flex items-center justify-between bg-blue-50/50 p-2 rounded-lg">
+                        <span className="text-[12px] text-black font-semibold">Jumlah Unit :</span>
+                        <div className="flex items-center space-x-3">
+                          <button 
+                            onClick={() => setServiceQtys(prev => ({ ...prev, [item.id]: Math.max(1, (prev[item.id] || 1) - 1) }))}
+                            className="w-6 h-6 bg-white border border-blue-200 rounded flex items-center justify-center text-blue-600"
+                          >-</button>
+                          <span className="text-sm font-bold">{serviceQtys[item.id] || 1}</span>
+                          <button 
+                            onClick={() => setServiceQtys(prev => ({ ...prev, [item.id]: (prev[item.id] || 1) + 1 }))}
+                            className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center text-white"
+                          >+</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ))}
 
                 <div className="pt-2 space-y-2 border-t border-gray-50 mt-2">

@@ -104,10 +104,13 @@ export default function OrderPage() {
     setLoading(false);
   }
 
-  // Ubah bagian ini
   const layananText = Array.isArray(orderData?.service) 
-    ? orderData.service.map(id => MAP_LAYANAN[id] || id).join(", ") 
-    : (MAP_LAYANAN[orderData?.service as unknown as string] || orderData?.service || "Layanan tidak tersedia");
+  ? orderData.service.map(item => {
+      const pureId = item.split(" (")[0];
+      const unitSuffix = item.includes(" (") ? " (" + item.split(" (")[1] : "";
+      return (MAP_LAYANAN[pureId] || pureId) + unitSuffix;
+    }).join(", ") 
+  : "Layanan tidak tersedia";
 
   if (fetching || !orderData) {
     return (

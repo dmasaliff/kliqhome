@@ -25,6 +25,8 @@ export async function submitOrder(data: {
   keluhan: string,
 }) {
 
+  const pureServiceIds = data.service.map(s => s.split(" (")[0]);
+
   const hasActionService = data.service.some(id => 
     id.startsWith("cuci_") || 
     id.startsWith("isi_freon_") || 
@@ -32,23 +34,26 @@ export async function submitOrder(data: {
     id.startsWith("bongkar")
   );
 
-  const namaLayananLengkap = data.service.map(id => {
-    const item = DAFTAR_LAYANAN.find(layanan => layanan.id === id);
-    return item ? item.label : id;
+  const namaLayananLengkap = data.service.map(s => {
+    const pureId = s.split(" (")[0];
+    const unitSuffix = s.includes(" (") ? " (" + s.split(" (")[1] : "";
+    const item = DAFTAR_LAYANAN.find(layanan => layanan.id === pureId);
+    return item ? `${item.label}${unitSuffix}` : s;
   }).join(", ");
 
   const supabase = await createClient();
-  const totalPrice = data.service.reduce((total, selectedId) => {
-  const layanan = DAFTAR_LAYANAN.find(item => item.id === selectedId);
-  
-  if (layanan) {
-    if (hasActionService && selectedId === "pengecekan") {
-      return total + 0;
+  const totalPrice = data.service.reduce((total, s) => {
+    const pureId = s.split(" (")[0];
+    const layanan = DAFTAR_LAYANAN.find(item => item.id === pureId)
+    
+    if (layanan) {
+      if (hasActionService && pureId === "pengecekan") {
+        return total + 0;
+      }
+      return total + layanan.harga;
     }
-    return total + layanan.harga;
-  }
-  return total;
-}, 0);
+    return total;
+  }, 0);
 
   console.log("Service yang diterima:", data.service);
   console.log("Total Harga terhitung:", totalPrice);
@@ -67,7 +72,7 @@ export async function submitOrder(data: {
         time_slot: data.time_slot,
         total_price: totalPrice,
         technician_share: technicianShare, 
-        status: 'available', // Status awal saat dipesan customer
+        status: 'available',
         keluhan: data.keluhan,
       }
     ])

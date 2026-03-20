@@ -224,8 +224,10 @@ export default function TechnicianProfile() {
                         </p>
                         <h4 className="font-bold text-lg mt-2 text-gray-800">
                             {item.service.map(id => {
-                                const item = DAFTAR_LAYANAN.find(layanan => layanan.id === id);
-                                return item ? item.label : id;
+                                const pureId = id.split(" (")[0];
+                                const unitSuffix = id.includes(" (") ? " (" + id.split(" (")[1] : "";
+                                const item = DAFTAR_LAYANAN.find(layanan => layanan.id === pureId);
+                                return item ? `${item.label}${unitSuffix}` : id;
                             }).join(", ")}
                         </h4>
                         </div>

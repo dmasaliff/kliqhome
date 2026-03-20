@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { TimeSlot } from "@/components/TimeSlot";
 import { SuccessSection } from "@/components/SuccessSection";
-import { ChevronLeft, Sun, CloudSun, Moon } from "lucide-react";
+import { ChevronLeft, Sun, CloudSun, Moon, Minus, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { submitOrder } from "@/app/actions/orderActions";
@@ -19,28 +19,70 @@ export default function PesanPage() {
   const [service, setService] = useState<string[]>([]);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [qtyCuci, setQtyCuci] = useState(1);
+  const [qtyFreon, setQtyFreon] = useState(1);
+  const [qtyBP, setQtyBP] = useState(1);
+  const [qtyPengecekan, setQtyPengecekan] = useState(1);
 
   const handleSuccess = async () => {
     if (!isFormValid || isLoading) return;
     setIsLoading(true);
+
+    const finalServices: string[] = [];
+
+    service.forEach((item) => {
+      if (item.startsWith("cuci_")) {
+        for (let i = 0; i < qtyCuci; i++) finalServices.push(`${item} (Unit ${i + 1})`);
+      } else if (item.includes("freon")) {
+        for (let i = 0; i < qtyFreon; i++) finalServices.push(`${item} (Unit ${i + 1})`);
+      } else if (item.includes("bongkar")) {
+        for (let i = 0; i < qtyBP; i++) finalServices.push(`${item} (Unit ${i + 1})`);
+      } else if (item === "pengecekan") {
+        for (let i = 0; i < qtyPengecekan; i++) finalServices.push(`pengecekan (Unit ${i + 1})`);
+      } else {
+        finalServices.push(item);
+      }
+    });
+
     try {
       await submitOrder({
         customer_name,
         customer_phone,
         address,
-        service,
+        service : finalServices,
         keluhan,
         time_slot: selectedSlot || "Belum dipilih",
       });
       
       setIsSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-  } catch (err) {
-    alert("Terjadi kesalahan sistem: " + (err as Error).message);
-  } finally {
-    setIsLoading(false);
-  }
-};
+    } catch (err) {
+      alert("Terjadi kesalahan sistem: " + (err as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const QtyCounter = ({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) => (
+    <div className="flex items-center justify-between ml-8 mt-2 bg-gray-50 p-2 rounded-lg border border-blue-100">
+      <span className="text-[12px] font-semibold text-black">{label}</span>
+      <div className="flex items-center space-x-4">
+        <button 
+          onClick={() => onChange(Math.max(1, value - 1))}
+          className="p-1 bg-white border border-blue-300 rounded-full text-blue-600 active:scale-90"
+        >
+          <Minus className="w-3 h-3" />
+        </button>
+        <span className="text-sm font-bold">{value}</span>
+        <button 
+          onClick={() => onChange(value + 1)}
+          className="p-1 bg-blue-600 rounded-full text-white active:scale-90"
+        >
+          <Plus className="w-3 h-3" />
+        </button>
+      </div>
+    </div>
+  );
 
   const handleLayananChange = (idBaru: string) => {
     setService((prev) => {
@@ -156,16 +198,21 @@ export default function PesanPage() {
                 />
                 <label htmlFor="cat_cuci" className="text-sm font-semibold">Cuci AC Rutin</label>
               </div>
-              <select 
-                disabled={!service.some(id => id.startsWith("cuci_"))}
-                onChange={(e) => handleLayananChange(e.target.value)} 
-                value={service.find(id => id.startsWith("cuci_")) || "cuci_05_1"}
-                className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50 outline-none disabled:opacity-50"
-              >
-                <option value="cuci_05_1">0.5 - 1 PK (Rp85.000)</option>
-                <option value="cuci_15">1.5 PK (Rp90.000)</option>
-                <option value="cuci_2">2 PK (Rp100.000)</option>
-              </select>
+              {service.some(id => id.startsWith("cuci_")) && (
+                <>
+                  <select 
+                    disabled={!service.some(id => id.startsWith("cuci_"))}
+                    onChange={(e) => handleLayananChange(e.target.value)} 
+                    value={service.find(id => id.startsWith("cuci_")) || "cuci_05_1"}
+                    className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50"
+                  >
+                    <option value="cuci_05_1">0.5 - 1 PK (Rp85k)</option>
+                    <option value="cuci_15">1.5 PK (Rp90k)</option>
+                    <option value="cuci_2">2 PK (Rp100k)</option>
+                  </select>
+                  <QtyCounter label="Jumlah AC Dicuci" value={qtyCuci} onChange={setQtyCuci} />
+                </>
+              )}
             </div>
 
             {/* 2. FREON */}
@@ -187,16 +234,21 @@ export default function PesanPage() {
                 />
                 <label htmlFor="cat_freon" className="text-sm font-semibold">Freon (Tambah/Isi)</label>
               </div>
-              <select 
-                disabled={!service.some(id => id.includes("freon"))}
-                onChange={(e) => handleLayananChange(e.target.value)}
-                value={service.find(id => id.includes("freon")) || "tambah_freon"}
-                className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50 outline-none disabled:opacity-50"
-              >
-                <option value="tambah_freon">Tambah Freon (Rp250.000)</option>
-                <option value="isi_freon_05_1">Isi Full 0.5 - 1 PK (Rp350.000)</option>
-                <option value="isi_freon_15_2">Isi Full 1.5 - 2 PK (Rp450.000)</option>
-              </select>
+              {service.some(id => id.includes("freon")) && (
+                <>
+                  <select 
+                    disabled={!service.some(id => id.includes("freon"))}
+                    onChange={(e) => handleLayananChange(e.target.value)}
+                    value={service.find(id => id.includes("freon")) || "tambah_freon"}
+                    className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50"
+                  >
+                    <option value="tambah_freon">Tambah (Rp250k)</option>
+                    <option value="isi_freon_05_1">Full 0.5-1PK (Rp350k)</option>
+                    <option value="isi_freon_15_2">Full 1.5-2PK (Rp450k)</option>
+                  </select>
+                  <QtyCounter label="Jumlah Unit Freon" value={qtyFreon} onChange={setQtyFreon} />
+                </>
+              )}
             </div>
 
             {/* 3. BONGKAR PASANG */}
@@ -218,16 +270,21 @@ export default function PesanPage() {
                 />
                 <label htmlFor="cat_bp" className="text-sm font-semibold">Bongkar Pasang</label>
               </div>
-              <select 
-                disabled={!service.some(id => id.includes("bongkar"))}
-                onChange={(e) => handleLayananChange(e.target.value)}
-                value={service.find(id => id.includes("bongkar")) || "bongkar"}
-                className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50 outline-none disabled:opacity-50"
-              >
-                <option value="bongkar">Bongkar Saja (Rp185.000)</option>
-                <option value="bongkar_pasang_05_1">Pasang Baru 0.5 - 1 PK (Rp450.000)</option>
-                <option value="bongkar_pasang_15_2">Pasang Baru 1.5 - 2 PK (Rp550.000)</option>
-              </select>
+              {service.some(id => id.includes("bongkar")) && (
+                <>
+                  <select 
+                    disabled={!service.some(id => id.includes("bongkar"))}
+                    onChange={(e) => handleLayananChange(e.target.value)}
+                    value={service.find(id => id.includes("bongkar")) || "bongkar"}
+                    className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50 outline-none disabled:opacity-50"
+                  >
+                    <option value="bongkar">Bongkar Saja (Rp185k)</option>
+                    <option value="bongkar_pasang_05_1">Pasang Baru 0.5 - 1 PK (Rp450k)</option>
+                    <option value="bongkar_pasang_15_2">Pasang Baru 1.5 - 2 PK (Rp550k)</option>
+                  </select>
+                  <QtyCounter label="Jumlah Unit Bongkar/Pasang" value={qtyBP} onChange={setQtyBP} />
+                </>
+              )}
             </div>
 
             {/* 4. PERBAIKAN & PENGECEKAN (ID: pengecekan / perbaikan) */}
@@ -235,7 +292,10 @@ export default function PesanPage() {
                 <div className="flex items-center space-x-3">
                   <Checkbox 
                     id="pengecekan" 
-                    onCheckedChange={() => handleLayananChange("pengecekan")}
+                    onCheckedChange={() => {
+                      handleLayananChange("pengecekan")
+                      if (!service.includes("pengecekan")) setQtyPengecekan(1);
+                    }}
                     checked={service.includes("pengecekan")} // Pastikan state sync
                     className="border-blue-300 data-[state=checked]:bg-blue-500" 
                   />
@@ -246,6 +306,13 @@ export default function PesanPage() {
                     </span>
                   </div>
                 </div>
+                {service.includes("pengecekan") && (
+                  <QtyCounter 
+                    label="Jumlah Unit Dicek" 
+                    value={qtyPengecekan} 
+                    onChange={setQtyPengecekan} 
+                  />
+                )}
 
                 <div className="flex items-center space-x-3">
                   <Checkbox 
