@@ -75,65 +75,70 @@ export default function HomePage() {
         </h1>
       </section>
 
-      <div className="grid grid-cols-1 gap-4 w-full max-w-sm">
-        {/* CUCI AC - Pakai 1 kolom penuh karena detailnya banyak */}
-        <div className="p-4 border rounded-xl bg-white shadow-sm">
-          <div className="flex justify-center items-center gap-3 mb-4">
-            <Snowflake className="text-blue-500" />
-            <span className="font-bold">CUCI AC RUTIN</span>
+      <div className="grid grid-cols-1 gap-4 w-full max-w-sm mx-auto p-2">
+        {/* 1. CUCI AC - Grid 2 Kolom agar Simetris */}
+        <div className="p-4 border rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-center gap-3 mb-4 border-b pb-2">
+            <Snowflake className="text-blue-500 w-5 h-5" />
+            <span className="font-bold text-sm tracking-wide">CUCI AC RUTIN</span>
           </div>
-          <div className="grid grid-cols-3 gap-2 text-xs text-blue-800">
-            <div className="flex flex-col items-start">
-              <span>0.5 - 1 PK</span>
-              <span className="font-bold text-black">Rp85rb</span>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col border-r pr-2">
+              <span className="text-[12px] text-blue-600 uppercase font-semibold">0.5 - 1 PK</span>
+              <span className="font-bold text-black text-lg">Rp70rb</span>
             </div>
-            <div className="flex flex-col  px-2 items-center">
-              <span>1.5 PK</span>
-              <span className="font-bold text-black">Rp90rb</span>
-            </div>
-            <div className="flex flex-col items-end">
-              <span>2 PK</span>
-              <span className="font-bold text-black">Rp100rb</span>
+            <div className="flex flex-col pl-2 text-right">
+              <span className="text-[12px] text-blue-600 uppercase font-semibold">1.5 - 2 PK</span>
+              <span className="font-bold text-black text-lg">Rp80rb</span>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          {/* FREON */}
-          <ServiceCard
-            title="FREON"
-            price="Mulai Rp250Rb"
-            description="Tambah: 250rb | Isi: 350rb"
-            Icon={Droplets}
-          />
-
-          {/* PERBAIKAN */}
-          <ServiceCard
-            title="CEK / REPAIR"
-            price="Rp75Rb"
-            description="Biaya kunjungan & cek"
-            Icon={Wrench}
-          />
+        {/* 2. FREON & REPAIR - Grid 2 Kolom Berdampingan */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="p-3 border rounded-2xl bg-white shadow-sm text-center">
+            <Droplets className="text-blue-400 w-5 h-5 mx-auto mb-2" />
+            <p className="text-[12px] font-bold text-black uppercase">Freon</p>
+            <p className="text-sm font-black text-black">Mulai Rp220rb</p>
+            <p className="text-[10px] text-blue-600 leading-tight mt-1">Tambah/Isi Full</p>
+          </div>
+          <div className="p-3 border rounded-2xl bg-white shadow-sm text-center">
+            <Wrench className="text-orange-400 w-5 h-5 mx-auto mb-2" />
+            <p className="text-[12px] font-bold text-black uppercase">Cek / Repair</p>
+            <p className="text-sm font-black text-black">Rp60rb</p>
+            <p className="text-[10px] text-blue-600 leading-tight mt-1">Biaya Kunjungan</p>
+          </div>
         </div>
 
-        {/* BONGKAR PASANG */}
-        <div className="p-4 border rounded-xl bg-white shadow-sm">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <ArrowsUpFromLine className="text-blue-600" />
-            <span className="font-bold">BONGKAR PASANG</span>
+        {/* 3. BONGKAR PASANG - Layout List agar tidak berantakan di Mobile */}
+        <div className="p-4 border rounded-2xl bg-white shadow-sm">
+          <div className="flex items-center justify-center gap-3 mb-4 border-b pb-2">
+            <ArrowsUpFromLine className="text-blue-600 w-5 h-5" />
+            <span className="font-bold text-sm tracking-wide uppercase">Bongkar Pasang</span>
           </div>
-          <div className="flex justify-between text-xs text-blue-800">
-            <div className="flex flex-col">
-              <span>0.5 - 1 PK</span>
-              <span className="font-bold text-black text-sm">Rp450rb</span>
+          
+          <div className="space-y-3">
+            {/* Baris 1: Pasang Saja */}
+            <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
+              <span className="text-[12px] font-medium text-black">Pasang Baru</span>
+              <div className="text-right">
+                <span className="block text-[12px] text-blue-600">0.5-1 PK : <b className="text-black">Rp300rb</b></span>
+                <span className="block text-[12px] text-blue-600">1.5-2 PK : <b className="text-black">Rp400rb</b></span>
+              </div>
             </div>
-            <div className="flex flex-col text-right">
-              <span>1.5 - 2 PK</span>
-              <span className="font-bold text-black text-sm">Rp550rb</span>
+
+            {/* Baris 2: Bongkar Pasang */}
+            <div className="flex justify-between items-center bg-blue-50/50 p-2 rounded-lg border border-blue-100">
+              <span className="text-[12px] font-bold text-black">Full (Bongkar+Pasang)</span>
+              <div className="text-right">
+                <span className="block text-[12px] text-black font-bold">Rp550rb <small className="font-normal text-blue-600">(0.5-1PK)</small></span>
+                <span className="block text-[12px] text-black font-bold">Rp600rb <small className="font-normal text-blue-600">(1.5-2PK)</small></span>
+              </div>
             </div>
           </div>
-          <div className="mt-2 text-[10px] text-gray-500 italic">
-            *Bongkar saja: Rp185rb
+
+          <div className="mt-3 flex justify-between items-center pt-2 border-t border-dashed">
+            <span className="text-[12px] text-red-500 italic font-medium">*Bongkar saja: Rp185rb</span>
           </div>
         </div>
       </div>

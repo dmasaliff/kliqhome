@@ -22,12 +22,14 @@ interface Order {
 
 const MAP_LAYANAN: Record<string, string> = {
   "cuci_05_1": "Cuci AC (0.5 - 1 PK)",
-  "cuci_15": "Cuci AC (1.5 PK)",
-  "cuci_2": "Cuci AC (2 PK)",
-  "tambah_freon": "Tambah Freon",
+  "cuci_15_2": "Cuci AC (1.5 - 2 PK)",
+  "tambah_freon_05_1": "Tambah Freon (0.5-1 PK)",
+  "tambah_freon_15_2": "Tambah Freon (1.5-2 PK)",
   "isi_freon_05_1": "Isi Freon Full (0.5-1 PK)",
   "isi_freon_15_2": "Isi Freon Full (1.5-2 PK)",
   "bongkar": "Bongkar AC",
+  "!bongkar_pasang_05_1": "Pasang AC (0.5-1 PK)",
+  "!bongkar_pasang_15_2": "Pasang AC (1.5-2 PK)",
   "bongkar_pasang_05_1": "Bongkar Pasang (0.5-1 PK)",
   "bongkar_pasang_15_2": "Bongkar Pasang (1.5-2 PK)",
   "perbaikan": "Perbaikan AC",

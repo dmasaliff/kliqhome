@@ -26,12 +26,14 @@ interface Order {
 
 const MAP_LAYANAN: Record<string, string> = {
   "cuci_05_1": "Cuci AC (0.5 - 1 PK)",
-  "cuci_15": "Cuci AC (1.5 PK)",
-  "cuci_2": "Cuci AC (2 PK)",
-  "tambah_freon": "Tambah Freon",
+  "cuci_15_2": "Cuci AC (1.5 - 2 PK)",
+  "tambah_freon_05_1": "Tambah Freon (0.5-1 PK)",
+  "tambah_freon_15_2": "Tambah Freon (1.5-2 PK)",
   "isi_freon_05_1": "Isi Freon Full (0.5-1 PK)",
   "isi_freon_15_2": "Isi Freon Full (1.5-2 PK)",
   "bongkar": "Bongkar AC",
+  "!bongkar_pasang_05_1": "Pasang AC (0.5-1 PK)",
+  "!bongkar_pasang_15_2": "Pasang AC (1.5-2 PK)",
   "bongkar_pasang_05_1": "Bongkar Pasang (0.5-1 PK)",
   "bongkar_pasang_15_2": "Bongkar Pasang (1.5-2 PK)",
   "perbaikan": "Perbaikan AC",
@@ -39,16 +41,18 @@ const MAP_LAYANAN: Record<string, string> = {
 };
 
 const DAFTAR_LAYANAN = [
-  { id: "cuci_05_1", label: "Cuci AC (0.5 - 1 PK)", harga: 85000 },
-  { id: "cuci_15", label: "Cuci AC (1.5 PK)", harga: 90000 },
-  { id: "cuci_2", label: "Cuci AC (2 PK)", harga: 100000 },
-  { id: "tambah_freon", label: "Tambah Freon", harga: 250000 },
+  { id: "cuci_05_1", label: "Cuci AC (0.5 - 1 PK)", harga: 70000 },
+  { id: "cuci_15_2", label: "Cuci AC (1.5 - 2 PK)", harga: 80000 },
+  { id: "tambah_freon_05_1", label: "Tambah Freon (0.5-1 PK)", harga: 220000 },
+  { id: "tambah_freon_15_2", label: "Tambah Freon (1.5-2 PK)", harga: 270000 },
   { id: "isi_freon_05_1", label: "Isi Freon Full (0.5-1 PK)", harga: 350000 },
   { id: "isi_freon_15_2", label: "Isi Freon Full (1.5-2 PK)", harga: 450000 },
   { id: "bongkar", label: "Bongkar AC", harga: 185000 },
-  { id: "bongkar_pasang_05_1", label: "Bongkar Pasang (0.5-1 PK)", harga: 450000 },
-  { id: "bongkar_pasang_15_2", label: "Bongkar Pasang (1.5-2 PK)", harga: 550000 },
-  { id: "pengecekan", label: "Pengecekan AC", harga: 75000 },
+  {id: "!bongkar_pasang_05_1", label: "Pasang AC (0.5-1 PK)", harga: 300000},
+  {id: "!bongkar_pasang_15_2", label: "Pasang AC (1.5-2 PK)", harga: 400000},
+  { id: "bongkar_pasang_05_1", label: "Bongkar Pasang (0.5-1 PK)", harga: 550000 },
+  { id: "bongkar_pasang_15_2", label: "Bongkar Pasang (1.5-2 PK)", harga: 600000 },
+  { id: "pengecekan", label: "Pengecekan AC", harga: 60000 },
 ];
 
 export default function DetailPekerjaan() {
@@ -89,7 +93,7 @@ export default function DetailPekerjaan() {
     const hasActionService = selectedServices.some(id => 
       id.startsWith("cuci_") || 
       id.startsWith("isi_freon_") || 
-      id.startsWith("tambah_freon") ||
+      id.startsWith("tambah_freon_") ||
       id.startsWith("bongkar")
     ) || (isPerbaikanChecked && listPerbaikan.some(item => item.nama !== "")); 
 

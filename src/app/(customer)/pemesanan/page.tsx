@@ -89,19 +89,19 @@ export default function PesanPage() {
       if (prev.includes(idBaru)) return prev.filter((id) => id !== idBaru);
       let tempService = [...prev];
 
-      if (["cuci_05_1", "cuci_15", "cuci_2"].includes(idBaru)) {
-        tempService = tempService.filter(id => !["cuci_05_1", "cuci_15", "cuci_2"].includes(id));
+      if (["cuci_05_1", "cuci_15_2"].includes(idBaru)) {
+        tempService = tempService.filter(id => !["cuci_05_1", "cuci_15_2"].includes(id));
       }
 
-      if (["tambah_freon", "isi_freon_05_1", "isi_freon_15_2"].includes(idBaru)) {
+      if (["tambah_freon_05_1", "tambah_freon_15_2", "isi_freon_05_1", "isi_freon_15_2"].includes(idBaru)) {
         tempService = tempService.filter(id => 
-          !["tambah_freon", "isi_freon_05_1", "isi_freon_15_2"].includes(id)
+          !["tambah_freon_05_1", "tambah_freon_15_2", "isi_freon_05_1", "isi_freon_15_2"].includes(id)
         );
       }
 
-      if (["bongkar", "bongkar_pasang_05_1", "bongkar_pasang_15_2"].includes(idBaru)) {
+      if (["bongkar", "!bongkar_pasang_05_1", "!bongkar_pasang_15_2", "bongkar_pasang_05_1", "bongkar_pasang_15_2"].includes(idBaru)) {
         tempService = tempService.filter(id => 
-          !["bongkar", "bongkar_pasang_05_1", "bongkar_pasang_15_2"].includes(id)
+          !["bongkar", "!bongkar_pasang_05_1", "!bongkar_pasang_15_2", "bongkar_pasang_05_1", "bongkar_pasang_15_2"].includes(id)
         );
       }
 
@@ -206,9 +206,8 @@ export default function PesanPage() {
                     value={service.find(id => id.startsWith("cuci_")) || "cuci_05_1"}
                     className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50"
                   >
-                    <option value="cuci_05_1">0.5 - 1 PK (Rp85k)</option>
-                    <option value="cuci_15">1.5 PK (Rp90k)</option>
-                    <option value="cuci_2">2 PK (Rp100k)</option>
+                    <option value="cuci_05_1">0.5 - 1 PK (Rp70k)</option>
+                    <option value="cuci_15_2">1.5 - 2 PK (Rp80k)</option>
                   </select>
                   <QtyCounter label="Jumlah AC Dicuci" value={qtyCuci} onChange={setQtyCuci} />
                 </>
@@ -222,10 +221,10 @@ export default function PesanPage() {
                   id="cat_freon" 
                   onCheckedChange={(checked) => {
                     if (checked) {
-                      handleLayananChange("tambah_freon"); 
+                      handleLayananChange("tambah_freon_05_1"); 
                     } else {
                       setService((prev) => prev.filter(id => 
-                        id !== "tambah_freon" && id !== "isi_freon_05_1" && id !== "isi_freon_15_2"
+                        id !== "tambah_freon_05_1" && id !== "tambah_freon_15_2" && id !== "isi_freon_05_1" && id !== "isi_freon_15_2"
                       ));
                     }
                   }}
@@ -239,10 +238,11 @@ export default function PesanPage() {
                   <select 
                     disabled={!service.some(id => id.includes("freon"))}
                     onChange={(e) => handleLayananChange(e.target.value)}
-                    value={service.find(id => id.includes("freon")) || "tambah_freon"}
+                    value={service.find(id => id.includes("freon")) || "tambah_freon_05_1"}
                     className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50"
                   >
-                    <option value="tambah_freon">Tambah (Rp250k)</option>
+                    <option value="tambah_freon_05_1">Tambah 0.5-1PK (Rp220k)</option>
+                    <option value="tambah_freon_15_2">Tambah 1.5-2PK (Rp270k)</option>
                     <option value="isi_freon_05_1">Full 0.5-1PK (Rp350k)</option>
                     <option value="isi_freon_15_2">Full 1.5-2PK (Rp450k)</option>
                   </select>
@@ -261,11 +261,13 @@ export default function PesanPage() {
                       handleLayananChange("bongkar"); 
                     } else {
                       setService((prev) => prev.filter(id => 
-                        !id.includes("bongkar")
+                        !["bongkar", "!bongkar_pasang_05_1", "!bongkar_pasang_15_2", "bongkar_pasang_05_1", "bongkar_pasang_15_2"].includes(id)
                       ));
                     }
                   }}
-                  checked={service.some(id => id.includes("bongkar"))}
+                  checked={service.some(id => 
+                    ["bongkar", "!bongkar_pasang_05_1", "!bongkar_pasang_15_2", "bongkar_pasang_05_1", "bongkar_pasang_15_2"].includes(id)
+                  )}
                   className="border-blue-300 data-[state=checked]:bg-blue-500" 
                 />
                 <label htmlFor="cat_bp" className="text-sm font-semibold">Bongkar Pasang</label>
@@ -275,12 +277,18 @@ export default function PesanPage() {
                   <select 
                     disabled={!service.some(id => id.includes("bongkar"))}
                     onChange={(e) => handleLayananChange(e.target.value)}
-                    value={service.find(id => id.includes("bongkar")) || "bongkar"}
+                    value={
+                      service.find(id => 
+                        ["bongkar", "!bongkar_pasang_05_1", "!bongkar_pasang_15_2", "bongkar_pasang_05_1", "bongkar_pasang_15_2"].includes(id)
+                      ) || "bongkar"
+                    }
                     className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50 outline-none disabled:opacity-50"
                   >
                     <option value="bongkar">Bongkar Saja (Rp185k)</option>
-                    <option value="bongkar_pasang_05_1">Pasang Baru 0.5 - 1 PK (Rp450k)</option>
-                    <option value="bongkar_pasang_15_2">Pasang Baru 1.5 - 2 PK (Rp550k)</option>
+                    <option value="!bongkar_pasang_05_1">Pasang Baru 0.5 - 1 PK (Rp300k)</option>
+                    <option value="!bongkar_pasang_15_2">Pasang Baru 1.5 - 2 PK (Rp400k)</option>
+                    <option value="bongkar_pasang_05_1">Bongkar Pasang 0.5 - 1 PK (Rp550k)</option>
+                    <option value="bongkar_pasang_15_2">Bongkar Pasang 1.5 - 2 PK (Rp600k)</option>
                   </select>
                   <QtyCounter label="Jumlah Unit Bongkar/Pasang" value={qtyBP} onChange={setQtyBP} />
                 </>
@@ -302,7 +310,7 @@ export default function PesanPage() {
                   <div className="flex flex-col">
                     <label htmlFor="pengecekan" className="text-sm font-semibold">Pengecekan AC</label>
                     <span className="text-[10px] text-red-500 italic">
-                      Rp75.000 (Gratis jika lanjut tindakan perbaikan/cuci)
+                      Rp60.000 (Gratis jika lanjut tindakan perbaikan/cuci)
                     </span>
                   </div>
                 </div>
