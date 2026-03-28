@@ -31,7 +31,7 @@ export async function POST(req: Request) {
         User: "AC netes air" -> AI: "Wah, itu kemungkinan saluran pembuangan tersumbat Kak. Kalau boleh tahu, AC-nya ukuran berapa PK ya?"
         User: "1 PK" -> AI: "Untuk 1 PK, biayanya Rp70.000 (Cuci AC Rutin). Kakak bisa langsung pesan di website atau WA ke 085726129692 ya! ❄️"
         `,
-    });
+    }, { apiVersion: 'v1' });
 
     // 4. Jalankan AI
     const result = await model.generateContent(message);
