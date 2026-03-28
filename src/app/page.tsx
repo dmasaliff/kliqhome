@@ -1,19 +1,20 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { ServiceCard } from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Snowflake, Droplets, Wrench, ArrowsUpFromLine, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { User as SupabaseUser } from '@supabase/supabase-js';
+import ChatBox from '@/components/Chatbox';
 
 export default function HomePage() {
   const router = useRouter();
   const supabase = createClient();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -151,6 +152,35 @@ export default function HomePage() {
             Pesan Sekarang
           </Button>
         </Link>
+      </div>
+
+      {/* --- AI AGENT FLOATING BUTTON --- */}
+      <div className="fixed bottom-24 right-6 z-50"> 
+        {/* bottom-24 supaya tidak menutupi button "Pesan Sekarang" */}
+        {isChatOpen ? (
+          <div className="relative w-[320px] sm:w-95 shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
+            <button 
+              onClick={() => setIsChatOpen(false)}
+              className="absolute -top-3 -right-3 bg-red-500 text-white w-7 h-7 rounded-full shadow-lg z-60 flex items-center justify-center text-xs"
+            >
+              ✕
+            </button>
+            <ChatBox />
+          </div>
+        ) : (
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="bg-[#007AFF] p-4 rounded-full shadow-xl hover:scale-105 transition-transform flex items-center gap-2 text-white border-2 border-white"
+          >
+            <div className="flex flex-col items-end mr-1">
+              <span className="text-[10px] opacity-80 leading-none">Bingung keluhan AC?</span>
+              <span className="text-xs font-bold">Tanya KLIQ AI</span>
+            </div>
+            <div className="bg-white/20 p-1.5 rounded-full">
+              <Wrench size={20} className="text-white" />
+            </div>
+          </button>
+        )}
       </div>
 
     </main>

@@ -1,0 +1,59 @@
+{
+  "services": {
+    "cuci_ac": {
+      "0.5_1_pk": 70000,
+      "1.5_2_pk": 80000
+    },
+    "freon": {
+      "tambah": {
+        "0.5_1_pk": 220000,
+        "1.5_2_pk": 270000
+      },
+      "full": {
+        "0.5_1_pk": 350000,
+        "1.5_2_pk": 450000
+      }
+    },
+    "bongkar_pasang": {
+      "bongkar_saja": 185000,
+      "pasang": {
+        "0.5_1_pk": 300000,
+        "1.5_2_pk": 400000
+      },
+      "paket_lengkap": {
+        "0.5_1_pk": 550000,
+        "1.5_2_pk": 600000
+      }
+    },
+    "biaya_lain": {
+      "pengecekan": 60000
+    }
+  },
+  "diagnostics": [
+    {
+      "gejala": "AC tidak dingin / hanya keluar angin",
+      "kemungkinan_masalah": "Filter kotor atau tekanan freon rendah",
+      "saran_layanan": ["cuci_ac", "freon.tambah"]
+    },
+    {
+      "gejala": "AC netes air dari unit indoor",
+      "kemungkinan_masalah": "Saluran pembuangan tersumbat lumut atau kotoran",
+      "saran_layanan": ["cuci_ac"]
+    },
+    {
+      "gejala": "AC mati total / tidak mau menyala",
+      "kemungkinan_masalah": "Masalah kelistrikan atau modul elektronik",
+      "saran_layanan": ["biaya_lain.pengecekan"]
+    },
+    {
+      "gejala": "Muncul bau tidak sedap saat AC nyala",
+      "kemungkinan_masalah": "Evaporator berjamur atau banyak debu menumpuk",
+      "saran_layanan": ["cuci_ac"]
+    },
+    {
+      "gejala": "Lampu indikator berkedip (error code)",
+      "kemungkinan_masalah": "Masalah pada sensor atau kebocoran freon",
+      "saran_layanan": ["biaya_lain.pengecekan"]
+    }
+  ]
+}
