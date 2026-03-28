@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const { message } = await req.json();
 
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-3-flash-preview",
+      model: "gemini-1.5-flash",
       
      systemInstruction: `
         Kamu adalah KLIQ AI, asisten servis AC jujur dari Jabodetabek.
@@ -39,8 +39,16 @@ export async function POST(req: Request) {
     const text = response.text();
 
     return NextResponse.json({ text });
-  } catch (error) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     console.error(error);
+
+    if (error.status === 503) {
+    return NextResponse.json({ 
+      text: "Maaf Kak, asisten AI sedang ramai banget. 🙏 Langsung hubungi kami di WA 085726129692 untuk tanya harga & booking ya! ❄️" 
+    });
+  }
+
     return NextResponse.json({ error: "Gagal memproses chat" }, { status: 500 });
   }
 }
