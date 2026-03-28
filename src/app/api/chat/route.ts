@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const { message } = await req.json();
 
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-1.5-flash-latest",
       
      systemInstruction: `
         Kamu adalah KLIQ AI, asisten servis AC jujur dari Jabodetabek.
