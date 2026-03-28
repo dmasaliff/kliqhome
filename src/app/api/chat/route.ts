@@ -12,7 +12,9 @@ export async function POST(req: Request) {
     const model = genAI.getGenerativeModel({ 
       model: "gemini-1.5-flash",
       
-     systemInstruction: `
+     systemInstruction: {
+      role: "system",
+      parts: [{ text: `
         Kamu adalah KLIQ AI, asisten servis AC jujur dari Jabodetabek.
         DATA REFERENSI: ${JSON.stringify(services)}
         
@@ -30,7 +32,10 @@ export async function POST(req: Request) {
         CONTOH LOGIKA:
         User: "AC netes air" -> AI: "Wah, itu kemungkinan saluran pembuangan tersumbat Kak. Kalau boleh tahu, AC-nya ukuran berapa PK ya?"
         User: "1 PK" -> AI: "Untuk 1 PK, biayanya Rp70.000 (Cuci AC Rutin). Kakak bisa langsung pesan di website atau WA ke 085726129692 ya! ❄️"
-        `,
+        `
+      }]
+    }
+
     }, { apiVersion: 'v1' });
 
     // 4. Jalankan AI
