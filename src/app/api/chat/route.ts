@@ -1,51 +1,47 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import services from "@/data/services.json";
 import { NextResponse } from "next/server";
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY!);
 
 export async function POST(req: Request) {
   try {
     const { message } = await req.json();
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
 
-    // Inisialisasi model di dalam POST dengan format string sederhana untuk systemInstruction
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash" 
-    });
-
-    // Kita masukkan instruksi sebagai bagian dari pesan (Prompt Engineering) 
-    // agar menghindari error JSON payload "systemInstruction" di Vercel.
-    const fullPrompt = `
-       Kamu adalah KLIQ AI, asisten servis AC jujur dari Jabodetabek.
-        DATA REFERENSI: ${JSON.stringify(services)}
-        
-        PROTOKOL KOMUNIKASI:
-        1. Identifikasi Gejala: Cocokkan keluhan user dengan bagian "diagnostics".
-        2. Cek PK: Jika user BELUM menyebutkan PK (0.5-1 atau 1.5-2), kamu WAJIB tanya dulu sebelum kasih harga.
-        3. Berikan Estimasi: Ambil harga spesifik dari "services". JANGAN mengarang harga.
-        4. Closing: Jika estimasi sudah diberikan, langsung arahkan ke WhatsApp 085726129692.
-
-        GAYA BAHASA:
-        - Maksimal 2-3 kalimat. 
-        - Ramah (Halo Kak/Pak/Bu) + Emoji 🛠️❄️.
+    // Gabungkan instruksi dan pesan jadi satu prompt string
+    const prompt = `
+      Kamu adalah KLIQ AI, asisten servis AC dari Jabodetabek.
+      DATA HARGA: ${JSON.stringify(services)}
+      Aturan: Sapa ramah, tanya PK (0.5-1 atau 1.5-2) jika belum ada, kasih harga dari data, arahkan ke WA 085726129692. Maksimal 2-3 kalimat.
+      
+      User: "${message}"
     `;
 
-    const result = await model.generateContent(fullPrompt);
-    const response = await result.response;
-    const text = response.text();
+    // TEMBAK LANGSUNG KE API V1 (Menghindari masalah SDK/v1beta)
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+        }),
+      }
+    );
 
-    return NextResponse.json({ text });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || "Gagal fetch API Google");
+    }
+
+    const aiText = data.candidates[0].content.parts[0].text;
+    return NextResponse.json({ text: aiText });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.error("DEBUG ERROR:", error);
-
-    if (error.status === 503) {
-      return NextResponse.json({ 
-        text: "Waduh, asisten AI lagi ramai banget Kak. 🙏 Langsung WA saja ya ke 085726129692!" 
-      });
-    }
-
-    return NextResponse.json({ error: "Gagal chat", details: error.message }, { status: 500 });
+    console.error("DEBUG ERROR FINAL:", error);
+    return NextResponse.json(
+      { text: "Maaf Kak, ada kendala koneksi AI. 🙏 Langsung WA ke 085726129692 ya!" },
+      { status: 200 } // Kembalikan 200 agar UI tidak crash
+    );
   }
 }
