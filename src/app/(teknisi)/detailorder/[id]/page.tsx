@@ -205,7 +205,7 @@ export default function DetailPekerjaan() {
         .eq('status', 'completed');
 
       // Jika orderan ke 1, 2, 3 (count 0, 1, 2), dapet 100%
-      const technicianShare = (count !== null && count < 3) 
+      const technicianShare = (count !== null && count < 1) 
         ? totalPrice 
         : totalPrice * 0.9;
 

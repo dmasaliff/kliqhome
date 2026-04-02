@@ -189,25 +189,6 @@ export default function TechnicianProfile() {
                     <p>Total Pendapatan Kotor Bulan Ini</p>
                     <p>Jatah Mitra (90%) : <span className="font-medium text-[#007AFF]">{formatIDR(finance.mitra)}</span></p>
                     <p>Kewajiban Setor (10%) : <span className="font-medium text-red-500">{formatIDR(finance.obligation)}</span></p>
-
-                    <UploadFotoDocument 
-                        id="foto-bukti-transfer" 
-                        label="Foto Bukti Transfer Kewajiban Setor" 
-                        previewUrl={previewTransfer} 
-                        onUpload={(preview, file) => {
-                            setPreviewTransfer(preview);
-                            setFileTransfer(file);
-                        }}
-                        onRemove={() => { setPreviewTransfer(null); setFileTransfer(null); }}
-                    />
-
-                        <button 
-                        disabled={isLoading || !fileTransfer}
-                        onClick={handleTransfer}
-                        className="w-full bg-[#007AFF] hover:bg-blue-600 text-white font-bold my-3 py-3 rounded-xl shadow-md transition-all active:scale-95"
-                        >
-                        {isLoading ? 'Mengirim...' : 'Kirim Bukti Transfer'}
-                        </button>
                 </div>
             </div>
 

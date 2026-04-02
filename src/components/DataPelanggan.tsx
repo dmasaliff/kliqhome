@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -16,6 +15,9 @@ export function DataPelanggan({ customer_name, customer_phone, service, address,
   const [isLoading, setIsLoading] = useState(false);
   const supabase = createClient();
   const params = useParams();
+
+  const waMessage = `Halo kak, saya ${customer_name} mau minta share lokasi untuk service AC ya. Terima kasih!`;
+
   const handleCancelOrder = async () => {
     setIsLoading(true);
     try {
@@ -53,9 +55,10 @@ export function DataPelanggan({ customer_name, customer_phone, service, address,
         <p>Jadwal : <span className="font-medium">{time_slot}</span></p>
       </div>
       <div className="flex gap-2">
-        <Link href={`https://wa.me/${customer_phone}`}>
-          <Button className="flex-1 bg-[#007AFF] hover:bg-blue-600 text-[10px] h-9 font-bold rounded-lg uppercase">Hubungi via WA</Button>
-        </Link>
+        <Button 
+          onClick={() => window.open(`https://wa.me/${customer_phone}?text=${encodeURIComponent(waMessage)}`, '_blank')}
+          className="flex-1 bg-[#007AFF] hover:bg-blue-600 text-[10px] h-9 font-bold rounded-lg uppercase">Hubungi via WA
+        </Button>
         <Button 
           onClick={handleCancelOrder}
           disabled={isLoading}
