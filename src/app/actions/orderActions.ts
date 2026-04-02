@@ -25,6 +25,7 @@ export async function submitOrder(data: {
   service: string[],
   time_slot: string,
   keluhan: string,
+  payment_method: string,
 }) {
 
   const pureServiceIds = data.service.map(s => s.split(" (")[0]);
@@ -76,6 +77,8 @@ export async function submitOrder(data: {
         technician_share: technicianShare, 
         status: 'available',
         keluhan: data.keluhan,
+        payment_method: data.payment_method,
+        payment_status: data.payment_method === "dp" ? "pending" : "paid",
       }
     ])
     .select() 
@@ -96,6 +99,7 @@ export async function submitOrder(data: {
       *Alamat:* ${data.address}
 
       *Total Bayar:* Rp ${totalPrice.toLocaleString('id-ID')}
+      *Metode Bayar:* ${data.payment_method === "dp" ? "DP" : "Full"}
       *Jatah Teknisi (90%): Rp ${technicianShare.toLocaleString('id-ID')}*
 
       ----------------------------------
@@ -103,11 +107,17 @@ export async function submitOrder(data: {
       ${orderUrl}
       ----------------------------------`;
 
+    const paymentText = data.payment_method === "dp"
+    ? "Silakan lakukan pembayaran DP terlebih dahulu untuk mengamankan jadwal 🙏"
+    : "Silakan lakukan pembayaran penuh agar pesanan segera diproses 🙏";
+
     const msgCustomer = `Halo Kak *${data.customer_name}*! 👋\n\n` +
       `Terima kasih sudah memesan di *KLIQ Home*. Pesanan Kakak sudah kami terima:\n\n` +
       `🛠 *Layanan:* ${namaLayananLengkap}\n` +
       `⏰ *Jadwal:* ${data.time_slot}\n` +
       `📍 *Alamat:* ${data.address}\n\n` +
+      `💳 *Metode Pembayaran:* ${data.payment_method === "dp" ? "DP" : "Full"}\n` +
+      `${paymentText}\n\n` +
       `Teknisi kami akan segera menghubungi Kakak dalam beberapa menit untuk konfirmasi kedatangan. Mohon ditunggu ya! 😊`;
 
     await fetch('https://api.fonnte.com/send', {

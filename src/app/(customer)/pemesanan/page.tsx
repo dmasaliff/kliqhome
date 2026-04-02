@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { submitOrder } from "@/app/actions/orderActions";
 
+
 export default function PesanPage() {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [customer_name, setCustomer_name] = useState("");
@@ -23,6 +24,44 @@ export default function PesanPage() {
   const [qtyFreon, setQtyFreon] = useState(1);
   const [qtyBP, setQtyBP] = useState(1);
   const [qtyPengecekan, setQtyPengecekan] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState<"dp" | "full">("dp");
+
+  // Fungsi untuk menghitung estimasi total harga
+  const calculateTotal = () => {
+    let total = 0;
+
+    service.forEach((item) => {
+      // 1. Hitung Cuci
+      if (item === "cuci_05_1") total += 70000 * qtyCuci;
+      if (item === "cuci_15_2") total += 80000 * qtyCuci;
+
+      // 2. Hitung Freon
+      if (item === "tambah_freon_05_1") total += 220000 * qtyFreon;
+      if (item === "tambah_freon_15_2") total += 270000 * qtyFreon;
+      if (item === "isi_freon_05_1") total += 350000 * qtyFreon;
+      if (item === "isi_freon_15_2") total += 450000 * qtyFreon;
+
+      // 3. Hitung Bongkar Pasang
+      if (item === "bongkar") total += 185000 * qtyBP;
+      if (item === "!bongkar_pasang_05_1") total += 300000 * qtyBP;
+      if (item === "!bongkar_pasang_15_2") total += 40000 * qtyBP;
+      if (item === "bongkar_pasang_05_1") total += 550000 * qtyBP;
+      if (item === "bongkar_pasang_15_2") total += 600000 * qtyBP;
+
+      // 4. Hitung Pengecekan
+      if (item === "pengecekan") total += 60000 * qtyPengecekan;
+    });
+
+    return total;
+  };
+
+  const totalHarga = calculateTotal();
+
+  const isHanyaPerbaikan = service.includes("perbaikan") || service.includes("pengecekan");
+  
+  const nominalTransfer = isHanyaPerbaikan 
+    ? 60000
+    : (paymentMethod === "dp" ? 35000 : totalHarga);
 
   const handleSuccess = async () => {
     if (!isFormValid || isLoading) return;
@@ -44,6 +83,10 @@ export default function PesanPage() {
       }
     });
 
+    const paymentLabel = paymentMethod === "dp" 
+    ? "DP terlebih dahulu" 
+    : "Full payment di awal";
+
     try {
       await submitOrder({
         customer_name,
@@ -52,6 +95,7 @@ export default function PesanPage() {
         service : finalServices,
         keluhan,
         time_slot: selectedSlot || "Belum dipilih",
+        payment_method: paymentLabel,
       });
       
       setIsSuccess(true);
@@ -105,15 +149,6 @@ export default function PesanPage() {
         );
       }
 
-      if (idBaru === "pengecekan") {
-        // Jika pilih pengecekan, hapus ID perbaikan
-        tempService = tempService.filter(id => id !== "perbaikan");
-      }
-      if (idBaru === "perbaikan") {
-        // Jika pilih perbaikan, hapus ID pengecekan (karena sudah otomatis dicek)
-        tempService = tempService.filter(id => id !== "pengecekan");
-      }
-
     const newState = [...tempService, idBaru];
     console.log("Daftar Layanan Saat Ini:", newState); // Tambahkan ini!
     return newState;
@@ -136,8 +171,14 @@ export default function PesanPage() {
   return (
     <main className="min-h-screen bg-[#D9E3F0] p-4 pb-24">
       {isSuccess ? (
-        <div className="pt-30 mt-10">
-          <SuccessSection />
+        <div className="mt-3">
+          <SuccessSection 
+            customerName={customer_name} 
+            paymentMethod={paymentMethod}
+            totalHarga={totalHarga}
+            nominalTransfer={nominalTransfer}
+            isHanyaPerbaikan={isHanyaPerbaikan}
+          />
         </div>
       ) : (
       
@@ -308,32 +349,22 @@ export default function PesanPage() {
                     className="border-blue-300 data-[state=checked]:bg-blue-500" 
                   />
                   <div className="flex flex-col">
-                    <label htmlFor="pengecekan" className="text-sm font-semibold">Pengecekan AC</label>
+                    <label htmlFor="pengecekan" className="text-sm font-semibold">Pengecekan / Perbaikan AC</label>
                     <span className="text-[10px] text-red-500 italic">
-                      Rp60.000 (Gratis jika lanjut tindakan perbaikan/cuci)
+                      Biaya cek Rp60.000 (Gratis jika lanjut tindakan perbaikan/cuci)
+                    </span>
+                    <span className="text-[10px] text-gray-700 italic mt-0.5">
+                      Estimasi total biaya perbaikan akan diinfokan teknisi di lokasi.
                     </span>
                   </div>
                 </div>
                 {service.includes("pengecekan") && (
                   <QtyCounter 
-                    label="Jumlah Unit Dicek" 
+                    label="Jumlah Unit Dicek / Diperbaiki" 
                     value={qtyPengecekan} 
                     onChange={setQtyPengecekan} 
                   />
                 )}
-
-                <div className="flex items-center space-x-3">
-                  <Checkbox 
-                    id="perbaikan" 
-                    checked={service.includes("perbaikan")} // Pastikan state sync
-                    onCheckedChange={() => handleLayananChange("perbaikan")}
-                    className="border-blue-300 data-[state=checked]:bg-blue-500" 
-                  />
-                  <div className="flex flex-col">
-                    <label htmlFor="perbaikan" className="text-sm font-semibold">Perbaikan (Troubleshoot)</label>
-                    <span className="text-[10px] text-gray-500 italic">Harga estimasi teknisi di lokasi</span>
-                  </div>
-                </div>
             </div>
           </div>
 
@@ -376,6 +407,34 @@ export default function PesanPage() {
               />
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl p-4 my-3 border border-blue-200 space-y-3">
+        <h3 className="text-xs font-bold text-gray-900">Metode Pembayaran</h3>
+
+        <div 
+          onClick={() => setPaymentMethod("dp")}
+          className={`p-3 rounded-xl border cursor-pointer ${
+            paymentMethod === "dp" ? "border-blue-500 bg-blue-50" : "border-gray-200"
+          }`}
+        >
+          <p className="text-sm font-semibold">Bayar DP Dulu</p>
+          <p className="text-xs text-gray-700">
+            Mulai dari Rp35.000 – sisanya setelah selesai
+          </p>
+        </div>
+
+        <div 
+          onClick={() => setPaymentMethod("full")}
+          className={`p-3 rounded-xl border cursor-pointer ${
+            paymentMethod === "full" ? "border-blue-500 bg-blue-50" : "border-gray-200"
+          }`}
+        >
+          <p className="text-sm font-semibold">Bayar Full di Awal</p>
+          <p className="text-xs text-gray-700">
+            Lebih praktis & dapat prioritas
+          </p>
         </div>
       </div>
 
