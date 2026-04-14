@@ -81,16 +81,34 @@ export default function HomePage() {
         <div className="p-4 border rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-center gap-3 mb-4 border-b pb-2">
             <Snowflake className="text-blue-500 w-5 h-5" />
-            <span className="font-bold text-sm tracking-wide">CUCI AC RUTIN</span>
+            <span className="font-bold text-sm tracking-wide">CUCI AC</span>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col border-r pr-2">
               <span className="text-[12px] text-blue-600 uppercase font-semibold">0.5 - 1 PK</span>
-              <span className="font-bold text-black text-lg">Rp70rb</span>
+              <span className="font-bold text-black text-lg">Rp80rb</span>
             </div>
             <div className="flex flex-col pl-2 text-right">
               <span className="text-[12px] text-blue-600 uppercase font-semibold">1.5 - 2 PK</span>
-              <span className="font-bold text-black text-lg">Rp80rb</span>
+              <span className="font-bold text-black text-lg">Rp100rb</span>
+            </div>
+          </div>
+        </div>
+
+        {/* cuci ac inverter */}
+        <div className="p-4 border rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-center gap-3 mb-4 border-b pb-2">
+            <Snowflake className="text-blue-500 w-5 h-5" />
+            <span className="font-bold text-sm tracking-wide">CUCI AC INVERTER</span>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col border-r pr-2">
+              <span className="text-[12px] text-blue-600 uppercase font-semibold">0.5 - 1 PK</span>
+              <span className="font-bold text-black text-lg">Rp100rb</span>
+            </div>
+            <div className="flex flex-col pl-2 text-right">
+              <span className="text-[12px] text-blue-600 uppercase font-semibold">1.5 - 2 PK</span>
+              <span className="font-bold text-black text-lg">Rp150rb</span>
             </div>
           </div>
         </div>

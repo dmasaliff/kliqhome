@@ -23,6 +23,8 @@ interface Order {
 const MAP_LAYANAN: Record<string, string> = {
   "cuci_05_1": "Cuci AC (0.5 - 1 PK)",
   "cuci_15_2": "Cuci AC (1.5 - 2 PK)",
+  "cuci_inverter_05_1": "Cuci AC Inverter (0.5 - 1 PK)",
+  "cuci_inverter_15_2": "Cuci AC Inverter (1.5 - 2 PK)",
   "tambah_freon_05_1": "Tambah Freon (0.5-1 PK)",
   "tambah_freon_15_2": "Tambah Freon (1.5-2 PK)",
   "isi_freon_05_1": "Isi Freon Full (0.5-1 PK)",

@@ -10,9 +10,6 @@ export const SuccessCard = ({ amount }: SuccessCardProps) => {
       <h2 className="text-[32px] font-bold text-blue-600 mb-2">
         Rp {amount.toLocaleString('id-ID')}
       </h2>
-      <p className="text-[12px] leading-relaxed font-medium">
-        Pastikan anda menerima uang dari customer sebelum menekan riwayat pendapatan anda
-      </p>
     </div>
   );
 };

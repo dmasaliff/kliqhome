@@ -32,8 +32,10 @@ export default function PesanPage() {
 
     service.forEach((item) => {
       // 1. Hitung Cuci
-      if (item === "cuci_05_1") total += 70000 * qtyCuci;
-      if (item === "cuci_15_2") total += 80000 * qtyCuci;
+      if (item === "cuci_05_1") total += 80000 * qtyCuci;
+      if (item === "cuci_15_2") total += 100000 * qtyCuci;
+      if (item === "cuci_inverter_05_1") total += 100000 * qtyCuci;
+      if (item === "cuci_inverter_15_2") total += 150000 * qtyCuci;
 
       // 2. Hitung Freon
       if (item === "tambah_freon_05_1") total += 220000 * qtyFreon;
@@ -133,8 +135,8 @@ export default function PesanPage() {
       if (prev.includes(idBaru)) return prev.filter((id) => id !== idBaru);
       let tempService = [...prev];
 
-      if (["cuci_05_1", "cuci_15_2"].includes(idBaru)) {
-        tempService = tempService.filter(id => !["cuci_05_1", "cuci_15_2"].includes(id));
+      if (["cuci_05_1", "cuci_15_2", "cuci_inverter_05_1", "cuci_inverter_15_2"].includes(idBaru)) {
+        tempService = tempService.filter(id => !["cuci_05_1", "cuci_15_2", "cuci_inverter_05_1", "cuci_inverter_15_2"].includes(id));
       }
 
       if (["tambah_freon_05_1", "tambah_freon_15_2", "isi_freon_05_1", "isi_freon_15_2"].includes(idBaru)) {
@@ -247,8 +249,10 @@ export default function PesanPage() {
                     value={service.find(id => id.startsWith("cuci_")) || "cuci_05_1"}
                     className="ml-8 w-full max-w-50 text-xs p-2 border border-blue-200 rounded-md bg-blue-50"
                   >
-                    <option value="cuci_05_1">0.5 - 1 PK (Rp70k)</option>
-                    <option value="cuci_15_2">1.5 - 2 PK (Rp80k)</option>
+                    <option value="cuci_05_1">0.5 - 1 PK (Rp80k)</option>
+                    <option value="cuci_15_2">1.5 - 2 PK (Rp100k)</option>
+                    <option value="cuci_inverter_05_1">Inverter 0.5 - 1 PK (Rp100k)</option>
+                    <option value="cuci_inverter_15_2">Inverter 1.5 - 2 PK (Rp150k)</option>
                   </select>
                   <QtyCounter label="Jumlah AC Dicuci" value={qtyCuci} onChange={setQtyCuci} />
                 </>

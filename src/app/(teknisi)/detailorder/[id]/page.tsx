@@ -27,6 +27,8 @@ interface Order {
 const MAP_LAYANAN: Record<string, string> = {
   "cuci_05_1": "Cuci AC (0.5 - 1 PK)",
   "cuci_15_2": "Cuci AC (1.5 - 2 PK)",
+  "cuci_inverter_05_1": "Cuci AC Inverter (0.5 - 1 PK)",
+  "cuci_inverter_15_2": "Cuci AC Inverter (1.5 - 2 PK)",
   "tambah_freon_05_1": "Tambah Freon (0.5-1 PK)",
   "tambah_freon_15_2": "Tambah Freon (1.5-2 PK)",
   "isi_freon_05_1": "Isi Freon Full (0.5-1 PK)",
@@ -41,8 +43,10 @@ const MAP_LAYANAN: Record<string, string> = {
 };
 
 const DAFTAR_LAYANAN = [
-  { id: "cuci_05_1", label: "Cuci AC (0.5 - 1 PK)", harga: 70000 },
-  { id: "cuci_15_2", label: "Cuci AC (1.5 - 2 PK)", harga: 80000 },
+  { id: "cuci_05_1", label: "Cuci AC (0.5 - 1 PK)", harga: 80000 },
+  { id: "cuci_15_2", label: "Cuci AC (1.5 - 2 PK)", harga: 100000 },
+  { id: "cuci_inverter_05_1", label: "Cuci AC Inverter (0.5 - 1 PK)", harga: 100000 },
+  { id: "cuci_inverter_15_2", label: "Cuci AC Inverter (1.5 - 2 PK)", harga: 150000 },
   { id: "tambah_freon_05_1", label: "Tambah Freon (0.5-1 PK)", harga: 220000 },
   { id: "tambah_freon_15_2", label: "Tambah Freon (1.5-2 PK)", harga: 270000 },
   { id: "isi_freon_05_1", label: "Isi Freon Full (0.5-1 PK)", harga: 350000 },
@@ -194,7 +198,6 @@ export default function DetailPekerjaan() {
       const totalPrice = totalBiaya;
 
       // --- LOGIC PROMO 100% ---
-      // Ambil ID teknisi dari orderData
       const technicianId = orderData?.technician_id;
       
       // Cek jumlah orderan completed teknisi ini
@@ -207,7 +210,7 @@ export default function DetailPekerjaan() {
       // Jika orderan ke 1, 2, 3 (count 0, 1, 2), dapet 100%
       const technicianShare = (count !== null && count < 1) 
         ? totalPrice 
-        : totalPrice * 0.9;
+        : totalPrice * 0.92; // 8% untuk platform
 
       const res = await supabase
         .from('bookings')
